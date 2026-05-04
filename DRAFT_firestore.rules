@@ -1,0 +1,120 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // PHASE 3: Primitives
+    function isSignedIn() { return request.auth != null; }
+    function isEmailVerified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isAdmin() { 
+      // Note: We use get() on the user document to check current role.
+      // Admin email from runtime: btechtools.ng@gmail.com
+      return isSignedIn() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        request.auth.token.email == 'btechtools.ng@gmail.com'
+      );
+    }
+
+    // PHASE 4: Entity Validations
+    function isValidUser(data) {
+      return data.email is string && data.email.size() <= 100
+             && data.balance is number && data.balance >= 0
+             && data.role in ['user', 'admin']
+             && data.status in ['active', 'suspended']
+             && data.uid == request.auth.uid;
+    }
+
+    function isValidInvestment(data) {
+      return data.userId == request.auth.uid 
+             && data.amount is number && data.amount > 0
+             && data.status in ['active', 'completed']
+             && data.createdAt == request.time;
+    }
+
+    function isValidTransaction(data) {
+      return data.userId == request.auth.uid
+             && data.type in ['deposit', 'withdrawal']
+             && data.amount is number && data.amount > 0
+             && data.status == 'pending'
+             && data.createdAt == request.time;
+    }
+
+    // MATCH BLOCKS
+    
+    // 1. Users
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin(); // Only admins can list all users
+      
+      allow create: if isSignedIn() && isValidId(userId) && userId == request.auth.uid
+                     && isValidUser(incoming())
+                     && incoming().balance == 0 
+                     && incoming().role == 'user'
+                     && incoming().createdAt == request.time;
+                     
+      allow update: if isSignedIn() && (
+        (request.auth.uid == userId && (
+          // User updates their own profile (display name, etc) but NOT role/balance
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'profilePic'])
+        )) || 
+        isAdmin() // Admin can update balance, earnings, status, role
+      );
+    }
+
+    // 2. Investments
+    match /investments/{invId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn() && isValidId(invId)
+                     && isValidInvestment(incoming())
+                     && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.balance >= incoming().amount;
+                     
+      allow update: if isAdmin(); // Users generally don't update investments directly, except maybe status via background logic elsewhere, but admin controls it.
+    }
+
+    // 3. Transactions
+    match /transactions/{txId} {
+      allow get: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      
+      allow create: if isSignedIn() && isValidId(txId)
+                     && isValidTransaction(incoming());
+                     
+      allow update: if isAdmin(); // Admin approves/rejects
+      allow delete: if isAdmin();
+    }
+
+    // 4. Plans & Wallets (Read for all, Write for Admin)
+    match /plans/{planId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /wallets/{walletId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 5. Config
+    match /config/general {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 6. Support Chats
+    match /chats/{userId} {
+      allow get, write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      
+      match /messages/{msgId} {
+        allow read, create: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+      }
+    }
+  }
+}
