@@ -45,95 +45,108 @@ export default function ReferralsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <div className="flex flex-col md:row items-center justify-between gap-6">
-           <div className="space-y-2">
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                 <Users className="text-primary" /> Multi-Tier Referral
+      <div className="space-y-10 pb-12">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+           <div className="space-y-3">
+              <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase vibrant-text leading-tight flex items-center gap-4">
+                 <Users className="text-primary size-8 md:size-12" /> Revenue Network
               </h1>
-              <p className="text-zinc-500">Invite friends and earn a fixed ${config?.referralBonus || 200} bonus for every new active miner.</p>
+              <p className="text-white/40 font-bold text-[10px] md:text-xs uppercase tracking-widest leading-relaxed max-w-xl">
+                Invite partners to the elite GoldBrick ecosystem and earn a secured <span className="text-primary font-black underline decoration-primary/30 underline-offset-4">${config?.referralBonus || 200}.00</span> payout for every active member verified.
+              </p>
            </div>
-           <Card className="bg-primary/10 border-primary/20 w-full md:w-auto">
-              <CardContent className="p-4 flex items-center gap-4">
-                 <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                    <Gift className="text-primary w-5 h-5" />
+           <Card className="bg-card border-border w-full lg:w-auto rounded-3xl shadow-xl overflow-hidden group hover:border-primary/30 transition-all border">
+              <CardContent className="p-8 flex items-center gap-6">
+                 <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 group-hover:scale-110 transition-transform">
+                    <Gift className="text-primary size-8" />
                  </div>
                  <div>
-                    <div className="text-[10px] text-zinc-400 font-bold uppercase">Total Referral Earnings</div>
-                    <div className="text-2xl font-black gold-text">${(userData as any)?.referralEarnings?.toLocaleString() || 0}</div>
+                    <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] mb-1">Network Earnings</div>
+                    <div className="text-3xl font-black font-mono text-white tracking-tighter italic">${(userData as any)?.referralEarnings?.toLocaleString() || 0}.00</div>
                  </div>
               </CardContent>
            </Card>
         </div>
 
-        <Card className="bg-zinc-950 border-primary/30 shadow-2xl shadow-primary/5">
-           <CardHeader>
-              <CardTitle className="gold-text italic uppercase font-black tracking-tighter">Your Invitation Link</CardTitle>
-              <CardDescription className="text-zinc-500 font-bold">Share this link to start earning mining bonuses today.</CardDescription>
+        <Card className="bg-card border-border shadow-2xl rounded-[3rem] overflow-hidden border-t-4 border-t-primary border">
+           <CardHeader className="p-8 md:p-10 border-b border-border bg-white/5">
+              <CardTitle className="text-2xl md:text-3xl font-black italic uppercase tracking-tighter text-white">Your Invitation Payload</CardTitle>
+              <CardDescription className="text-white/40 font-bold text-[10px] uppercase tracking-widest mt-2 px-1">SHARE YOUR UNIQUE LINK TO ACTIVATE NETWORK BONUSES</CardDescription>
            </CardHeader>
-           <CardContent className="space-y-6">
-              <div className="flex flex-col md:flex-row gap-3">
-                 <Input 
-                   readOnly 
-                   value={referralLink}
-                   className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-mono text-primary flex-1 px-4 text-xs"
-                 />
-                 <Button onClick={handleCopy} className="h-14 bg-primary text-black font-black uppercase text-xs px-8 gold-glow">
-                    <Copy className="w-5 h-5 mr-1" /> Copy Link
+           <CardContent className="space-y-10 p-8 md:p-10">
+              <div className="flex flex-col md:flex-row gap-4">
+                 <div className="flex-1 relative group">
+                    <Copy className="absolute left-6 top-1/2 -translate-y-1/2 size-5 text-slate-300 group-focus-within:text-primary" />
+                    <Input 
+                      readOnly 
+                      value={referralLink}
+                      className="bg-background border-border h-16 md:h-20 font-mono text-white flex-1 pl-16 rounded-2xl text-[10px] md:text-sm font-bold shadow-inner focus:ring-1 focus:ring-primary/20"
+                    />
+                 </div>
+                 <Button onClick={handleCopy} className="h-16 md:h-20 bg-primary text-primary-foreground font-black uppercase text-sm px-10 rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                    <Copy className="size-5 mr-3" /> COPY PAYLOAD
                  </Button>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-                 <div className="p-6 bg-zinc-900/40 rounded-2xl border border-zinc-800/50 space-y-2">
-                    <div className="text-primary font-black italic text-lg uppercase">Step 1</div>
-                    <div className="font-black text-white italic uppercase tracking-tighter">Share Link</div>
-                    <p className="text-xs text-zinc-500 font-medium">Post on social media or send to friends directly.</p>
-                 </div>
-                 <div className="p-6 bg-zinc-900/40 rounded-2xl border border-zinc-800/50 space-y-2">
-                    <div className="text-primary font-black italic text-lg uppercase">Step 2</div>
-                    <div className="font-black text-white italic uppercase tracking-tighter">Partner Invests</div>
-                    <p className="text-xs text-zinc-500 font-medium">They register and start their first mining session.</p>
-                 </div>
-                 <div className="p-6 bg-zinc-900/40 rounded-2xl border border-zinc-800/50 space-y-2">
-                    <div className="text-primary font-black italic text-lg uppercase">Step 3</div>
-                    <div className="font-black text-white italic uppercase tracking-tighter">Claim ${config?.referralBonus || 200}</div>
-                    <p className="text-xs text-zinc-500 font-medium">The bonus is instantly credited to your available balance.</p>
-                 </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                 {[
+                   { step: '01', title: 'Share Payload', desc: 'Distribute your unique mining link via secure channels.' },
+                   { step: '02', title: 'Partner Engagement', desc: 'Contact registers and initiates a mining session.' },
+                   { step: '03', title: 'Instant Bounty', desc: `Claim your $${config?.referralBonus || 200} instantly into your active balance.` }
+                 ].map((item, i) => (
+                    <div key={i} className="p-8 bg-white/5 rounded-[2rem] border border-border space-y-4 hover:border-primary/20 transition-colors group">
+                       <div className="text-primary font-black italic text-3xl opacity-20 group-hover:opacity-100 transition-opacity font-mono">{item.step}</div>
+                       <div className="font-black text-white italic uppercase tracking-tighter text-xl">{item.title}</div>
+                       <p className="text-[11px] text-white/40 font-bold uppercase tracking-wide leading-relaxed">{item.desc}</p>
+                    </div>
+                 ))}
               </div>
            </CardContent>
         </Card>
 
-        <div className="space-y-4">
-           <h3 className="text-xl font-black italic uppercase tracking-tighter gold-text">Your Referrals ({referrals.length})</h3>
-           <Card className="bg-zinc-950 border-zinc-900 overflow-hidden shadow-inner">
+        <div className="space-y-6">
+           <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-black italic uppercase tracking-tighter vibrant-text">Active Network ({referrals.length})</h3>
+              <Badge className="bg-primary/10 text-primary border-none font-black px-4 py-1.5 rounded-full uppercase text-[10px] tracking-widest">Real-time Data</Badge>
+           </div>
+           <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-xl border">
               <CardContent className="p-0">
-                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                       <thead className="bg-zinc-900 text-zinc-400 text-[10px] uppercase font-black tracking-widest">
+                 <div className="overflow-x-auto no-scrollbar">
+                    <table className="w-full text-left">
+                       <thead className="bg-white/5 text-white/40 text-[10px] uppercase font-black tracking-[0.2em] border-b border-border">
                           <tr>
-                             <th className="px-6 py-5">User</th>
-                             <th className="px-6 py-5">Total Invested</th>
-                             <th className="px-6 py-5">Status</th>
-                             <th className="px-6 py-5">Joined</th>
+                             <th className="px-8 py-6 uppercase">Partner Profile</th>
+                             <th className="px-8 py-6 uppercase text-center">Assets Engaged</th>
+                             <th className="px-8 py-6 uppercase text-center">Audit Status</th>
+                             <th className="px-8 py-6 uppercase text-right">Deployment Date</th>
                           </tr>
                        </thead>
-                       <tbody className="divide-y divide-zinc-900">
+                       <tbody className="divide-y divide-border">
                           {referrals.length === 0 ? (
                              <tr>
-                                <td colSpan={4} className="px-6 py-16 text-center text-zinc-700 italic font-black uppercase text-[10px] tracking-widest">No referrals yet. Start sharing to grow your team!</td>
+                                <td colSpan={4} className="px-8 py-24 text-center text-white/20 italic font-black uppercase text-xs tracking-[0.4em]">Zero active network nodes detected</td>
                              </tr>
                           ) : (
                              referrals.map(r => (
-                                <tr key={r.id} className="hover:bg-zinc-900/30 transition-colors">
-                                   <td className="px-6 py-4 font-black text-white italic uppercase tracking-tighter">{r.displayName}</td>
-                                   <td className="px-6 py-4 font-mono text-zinc-300 font-black">${r.totalInvested?.toLocaleString() || 0}</td>
-                                   <td className="px-6 py-4">
-                                      <Badge className={r.totalInvested > 0 ? 'bg-green-500/10 text-green-500 border-none px-2 font-black uppercase text-[9px]' : 'bg-zinc-500/10 text-zinc-600 border-none px-2 font-black uppercase text-[9px]'}>
-                                         {r.totalInvested > 0 ? 'Active' : 'Unactive'}
+                                <tr key={r.id} className="hover:bg-white/5 transition-colors group">
+                                   <td className="px-8 py-6">
+                                      <div className="flex items-center gap-4">
+                                         <div className="size-10 rounded-xl bg-white/5 flex items-center justify-center font-black italic text-primary border border-white/10">
+                                            {r.displayName?.charAt(0).toUpperCase()}
+                                         </div>
+                                         <span className="font-black text-white italic uppercase tracking-tighter text-sm">{r.displayName}</span>
+                                      </div>
+                                   </td>
+                                   <td className="px-8 py-6 text-center">
+                                      <span className="font-mono text-white font-extrabold text-sm">${r.totalInvested?.toLocaleString() || '0.00'}</span>
+                                   </td>
+                                   <td className="px-8 py-6 text-center">
+                                      <Badge className={`uppercase text-[9px] font-black tracking-widest border-none px-3 h-6 ${r.totalInvested > 0 ? 'bg-green-500/10 text-green-500 shadow-sm shadow-green-500/10' : 'bg-white/5 text-white/20'}`}>
+                                         {r.totalInvested > 0 ? 'Active node' : 'Standby'}
                                       </Badge>
                                    </td>
-                                   <td className="px-6 py-4 text-zinc-400 font-medium">
-                                      {r.createdAt ? new Date(r.createdAt.toDate()).toLocaleDateString() : 'Just now'}
+                                   <td className="px-8 py-6 text-right text-white/40 font-mono font-bold text-[10px]">
+                                      {r.createdAt ? new Date(r.createdAt.toDate()).toLocaleDateString() : 'INITIALIZING...'}
                                    </td>
                                 </tr>
                              ))

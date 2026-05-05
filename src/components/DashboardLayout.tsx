@@ -44,28 +44,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const isAdmin = userData?.role === 'admin' || (auth.currentUser?.email && adminEmails.includes(auth.currentUser.email));
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col md:flex-row pb-20 md:pb-0">
+    <div className="min-h-screen bg-background text-white flex flex-col md:flex-row pb-20 md:pb-0 font-sans">
       {/* Floating Support Button */}
       <Link 
         to="/support"
-        className="fixed bottom-24 right-6 z-[60] md:bottom-8 md:right-8 bg-primary w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-primary/30 hover:scale-110 transition-transform cursor-pointer gold-glow"
+        className="fixed bottom-24 right-6 z-[60] md:bottom-8 md:right-8 bg-primary w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-primary/30 hover:scale-110 transition-transform cursor-pointer"
       >
-        <MessageSquare className="text-black w-7 h-7" />
+        <MessageSquare className="text-primary-foreground w-7 h-7" />
       </Link>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden flex items-center justify-between p-4 border-b border-zinc-900 bg-black sticky top-0 z-50">
+      <header className="md:hidden flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-50">
         <Link to="/dashboard">
           <Logo className="h-8" />
         </Link>
-        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white">
           {isSidebarOpen ? <X /> : <Menu />}
         </Button>
       </header>
 
       {/* Sidebar for Desktop & Mobile Overlay */}
       <aside className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-zinc-950 border-r border-zinc-900 transition-transform md:translate-x-0 md:static
+        fixed inset-y-0 left-0 z-40 w-64 bg-card border-r border-border transition-transform md:translate-x-0 md:static
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
@@ -82,39 +82,41 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-colors
-                  ${location.pathname === item.path ? 'bg-primary text-black font-bold' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                  ${location.pathname === item.path 
+                    ? 'bg-primary text-primary-foreground font-black italic shadow-lg shadow-primary/20' 
+                    : 'text-white/40 hover:bg-white/5 hover:text-white'}
                 `}
               >
-                <item.icon className="w-5 h-5" />
-                {item.name}
+                <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-white' : 'text-primary'}`} />
+                <span className="text-xs font-black uppercase tracking-widest">{item.name}</span>
               </Link>
             ))}
 
             {isAdmin && (
               <Link 
                 to="/admin"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/40 hover:bg-white/5 hover:text-white"
                 onClick={() => setIsSidebarOpen(false)}
               >
-                <Settings className="w-5 h-5" />
-                Admin Panel
+                <Settings className="w-5 h-5 text-primary" />
+                <span className="text-xs font-black uppercase tracking-widest">Admin Panel</span>
               </Link>
             )}
 
             <button 
               onClick={handleLogout}
-              className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-zinc-400 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+              className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
             >
               <LogOut className="w-5 h-5" />
-              Logout
+              <span className="text-xs font-black uppercase tracking-widest">Logout</span>
             </button>
           </nav>
 
-          <div className="p-4 border-t border-zinc-900 hidden md:block">
-             <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-red-500 hover:bg-red-500/10" onClick={handleLogout}>
+          <div className="p-4 border-t border-border hidden md:block">
+             <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>
                 <LogOut className="w-5 h-5 mr-3" />
-                Logout
+                <span className="text-xs font-black uppercase tracking-widest">Logout</span>
              </Button>
           </div>
         </div>
@@ -128,28 +130,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       {/* Quick Footer for Mobile */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-zinc-950 border-t border-zinc-900 flex items-center justify-around px-4 z-50">
-        <Link to="/dashboard" className={`flex flex-col items-center gap-1 ${location.pathname === '/dashboard' ? 'text-primary' : 'text-zinc-500'}`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border flex items-center justify-around px-4 z-50">
+        <Link to="/dashboard" className={`flex flex-col items-center gap-1 ${location.pathname === '/dashboard' ? 'text-primary' : 'text-white/40'}`}>
           <LayoutDashboard className="w-6 h-6" />
-          <span className="text-[10px]">Home</span>
+          <span className="text-[10px] font-black uppercase">Home</span>
         </Link>
-        <Link to="/invest" className={`flex flex-col items-center gap-1 ${location.pathname === '/invest' ? 'text-primary' : 'text-zinc-500'}`}>
+        <Link to="/invest" className={`flex flex-col items-center gap-1 ${location.pathname === '/invest' ? 'text-primary' : 'text-white/40'}`}>
           <BarChart3 className="w-6 h-6" />
-          <span className="text-[10px]">Invest</span>
+          <span className="text-[10px] font-black uppercase">Invest</span>
         </Link>
         <Link to="/deposit" className="flex flex-col items-center -mt-8">
-          <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 border-4 border-black">
-            <ArrowDownLeft className="text-black w-7 h-7" />
+          <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-background">
+            <ArrowDownLeft className="text-white w-7 h-7" />
           </div>
-          <span className="text-[10px] mt-1 text-primary">Deposit</span>
+          <span className="text-[10px] mt-1 text-primary font-black uppercase">Deposit</span>
         </Link>
-        <Link to="/withdraw" className={`flex flex-col items-center gap-1 ${location.pathname === '/withdraw' ? 'text-primary' : 'text-zinc-500'}`}>
+        <Link to="/withdraw" className={`flex flex-col items-center gap-1 ${location.pathname === '/withdraw' ? 'text-primary' : 'text-white/40'}`}>
           <ArrowUpRight className="w-6 h-6" />
-          <span className="text-[10px]">Withdraw</span>
+          <span className="text-[10px] font-black uppercase">Withdraw</span>
         </Link>
-        <Link to="/transactions" className={`flex flex-col items-center gap-1 ${location.pathname === '/transactions' ? 'text-primary' : 'text-zinc-500'}`}>
+        <Link to="/transactions" className={`flex flex-col items-center gap-1 ${location.pathname === '/transactions' ? 'text-primary' : 'text-white/40'}`}>
           <History className="w-6 h-6" />
-          <span className="text-[10px]">History</span>
+          <span className="text-[10px] font-black uppercase">History</span>
         </Link>
       </nav>
     </div>

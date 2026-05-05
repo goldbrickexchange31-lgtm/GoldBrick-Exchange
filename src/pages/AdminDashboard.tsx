@@ -393,32 +393,32 @@ export default function AdminDashboard() {
   };
 
   if (loading) return (
-    <div className="h-screen w-screen flex items-center justify-center bg-black">
+    <div className="h-screen w-screen flex items-center justify-center bg-background">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-300 font-sans flex overflow-hidden">
+    <div className="min-h-screen bg-background text-white font-sans flex overflow-hidden">
       {/* Sidebar Mobile Overlay */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/90 z-40 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar Content */}
       <aside className={`
-        fixed inset-y-0 left-0 w-72 bg-[#080808] border-r border-zinc-900 z-50 transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 w-72 bg-card border-r border-border z-50 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:relative lg:translate-x-0
       `}>
-        <div className="p-8 border-b border-zinc-900">
-          <h2 className="text-2xl font-black gold-text italic tracking-tighter uppercase flex items-center gap-2">
+        <div className="p-8 border-b border-border">
+          <h2 className="text-2xl font-black vibrant-text italic tracking-tighter uppercase flex items-center gap-2">
             Admin Panel
           </h2>
-          <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mt-1">Status: Master Mode</p>
+          <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-1">Status: Master Mode</p>
         </div>
 
         <nav className="p-4 space-y-1">
@@ -428,7 +428,7 @@ export default function AdminDashboard() {
               onClick={() => { setActiveSection(item.id as Section); setIsSidebarOpen(false); }}
               className={`
                 w-full flex items-center justify-between px-4 py-4 rounded-xl transition-all group
-                ${activeSection === item.id ? 'bg-primary text-black font-black' : 'hover:bg-zinc-900 text-zinc-500'}
+                ${activeSection === item.id ? 'bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20' : 'hover:bg-white/5 text-white/40'}
               `}
             >
               <div className="flex items-center gap-3">
@@ -436,7 +436,7 @@ export default function AdminDashboard() {
                 <span className="text-xs uppercase tracking-widest font-bold">{item.label}</span>
               </div>
               {item.badge ? (
-                <span className={`text-[10px] px-2 py-0.5 rounded-md ${activeSection === item.id ? 'bg-black text-primary' : 'bg-primary text-black'} font-black`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-md ${activeSection === item.id ? 'bg-white text-primary' : 'bg-primary text-primary-foreground'} font-black`}>
                   {item.badge}
                 </span>
               ) : (
@@ -446,13 +446,13 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-zinc-900 space-y-2">
-            <Link to="/dashboard">
-               <Button variant="ghost" className="w-full text-zinc-600 hover:text-white uppercase text-[10px] font-black tracking-widest justify-start">
+        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border space-y-2">
+            <Link to="/dashboard" className="block w-full">
+               <Button variant="ghost" className="w-full text-white/40 hover:text-primary uppercase text-[10px] font-black tracking-widest justify-start rounded-xl">
                  <LayoutDashboard className="mr-2 size-3" /> Dashboard
                </Button>
             </Link>
-            <Button onClick={handleLogout} variant="ghost" className="w-full text-zinc-600 hover:text-red-500 uppercase text-[10px] font-black tracking-widest justify-start">
+            <Button onClick={handleLogout} variant="ghost" className="w-full text-white/40 hover:text-red-500 hover:bg-red-500/10 uppercase text-[10px] font-black tracking-widest justify-start rounded-xl">
               <LogOut className="mr-2 size-3" /> Logout
             </Button>
         </div>
@@ -460,22 +460,22 @@ export default function AdminDashboard() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        <header className="h-20 border-b border-zinc-900 flex items-center justify-between px-6 lg:px-10 shrink-0">
+        <header className="h-20 border-b border-border bg-card flex items-center justify-between px-6 lg:px-10 shrink-0">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 text-zinc-500"
+              className="lg:hidden p-2 text-slate-400"
             >
               <Menu size={24} />
             </button>
-            <h1 className="text-xl font-black italic gold-text uppercase tracking-tighter">
+            <h1 className="text-xl font-black italic vibrant-text uppercase tracking-tighter">
               {sidebarItems.find(i => i.id === activeSection)?.label}
             </h1>
           </div>
           <div className="flex items-center gap-4">
-             <div className="hidden sm:flex items-center gap-2 bg-zinc-900/50 px-4 py-2 rounded-full border border-zinc-800">
+             <div className="hidden sm:flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-border">
                 <div className="size-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">System Active</span>
+                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">System Active</span>
              </div>
           </div>
         </header>
@@ -486,74 +486,74 @@ export default function AdminDashboard() {
             <div className="space-y-10">
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                  {[
-                   { label: 'Total Users', val: users.length, icon: Users, color: 'text-blue-500' },
-                   { label: 'Pending Deposits', val: transactions.filter(t => t.type === 'deposit' && t.status === 'pending').length, icon: ArrowDownLeft, color: 'text-primary' },
-                   { label: 'Pending Payouts', val: transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending').length, icon: ArrowUpRight, color: 'text-orange-500' },
-                   { label: 'Profit Today', val: '$0.00', icon: BarChart2, color: 'text-green-500' }
+                   { label: 'Total Users', val: users.length, icon: Users, color: 'text-primary', bgColor: 'bg-primary/5' },
+                   { label: 'Pending Deposits', val: transactions.filter(t => t.type === 'deposit' && t.status === 'pending').length, icon: ArrowDownLeft, color: 'text-primary', bgColor: 'bg-primary/10' },
+                   { label: 'Pending Payouts', val: transactions.filter(t => t.type === 'withdrawal' && t.status === 'pending').length, icon: ArrowUpRight, color: 'text-orange-600', bgColor: 'bg-orange-500/10' },
+                   { label: 'Profit Today', val: '$0.00', icon: BarChart2, color: 'text-green-600', bgColor: 'bg-green-500/10' }
                  ].map((stat, i) => (
-                   <Card key={i} className="bg-[#080808] border-zinc-900 rounded-3xl gold-glow group transition-all hover:border-primary/20">
-                      <CardContent className="p-8 flex items-center justify-between">
-                         <div className="space-y-1">
-                            <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">{stat.label}</p>
-                            <h3 className="text-3xl font-black italic text-white tracking-tighter">{stat.val}</h3>
-                         </div>
-                         <div className={`p-4 rounded-2xl bg-zinc-950 border border-zinc-900 ${stat.color} group-hover:scale-110 transition-transform`}>
-                            <stat.icon className="size-6" />
-                         </div>
-                      </CardContent>
-                   </Card>
+                    <Card key={i} className="bg-card border-border rounded-3xl group transition-all hover:border-primary/20 shadow-sm border">
+                       <CardContent className="p-8 flex items-center justify-between">
+                          <div className="space-y-1">
+                             <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{stat.label}</p>
+                             <h3 className="text-3xl font-black italic text-white tracking-tighter">{stat.val}</h3>
+                          </div>
+                          <div className={`p-4 rounded-2xl ${stat.bgColor} border border-transparent ${stat.color} group-hover:scale-110 transition-transform`}>
+                             <stat.icon className="size-6" />
+                          </div>
+                       </CardContent>
+                    </Card>
                  ))}
                </div>
 
                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  <Card className="lg:col-span-2 bg-[#080808] border-zinc-900 rounded-3xl overflow-hidden shadow-2xl">
-                     <CardHeader className="bg-zinc-900/10 p-6 border-b border-zinc-900 flex flex-row items-center justify-between">
+                  <Card className="lg:col-span-2 bg-card border-border rounded-3xl overflow-hidden shadow-md">
+                     <CardHeader className="bg-white/5 p-6 border-b border-border flex flex-row items-center justify-between">
                         <div>
-                          <CardTitle className="text-base font-black italic uppercase tracking-tighter">Recent Activities</CardTitle>
-                          <CardDescription className="text-[10px] uppercase font-bold text-zinc-600 font-mono">Latest network updates</CardDescription>
+                          <CardTitle className="text-base font-black italic uppercase tracking-tighter text-white">Recent Activities</CardTitle>
+                          <CardDescription className="text-[10px] uppercase font-bold text-white/40 font-mono">Latest network updates</CardDescription>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={() => setActiveSection('deposit')} className="text-xs text-primary font-black uppercase tracking-widest">Manage All</Button>
+                        <Button variant="ghost" size="sm" onClick={() => setActiveSection('deposit')} className="text-xs text-primary font-black uppercase tracking-widest hover:bg-primary/10">Manage All</Button>
                      </CardHeader>
                      <CardContent className="p-0">
-                        <div className="divide-y divide-zinc-900/40">
+                        <div className="divide-y divide-border">
                            {transactions.slice(0, 10).map(tx => (
-                             <div key={tx.id} className="p-6 flex items-center justify-between hover:bg-zinc-900/20 transition-all cursor-pointer" onClick={() => { setSelectedTx(tx); setIsReceiptOpen(true); }}>
+                             <div key={tx.id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer" onClick={() => { setSelectedTx(tx); setIsReceiptOpen(true); }}>
                                 <div className="flex items-center gap-4">
-                                   <div className={`size-10 rounded-xl flex items-center justify-center ${tx.type === 'deposit' ? 'bg-blue-500/10 text-blue-500' : 'bg-orange-500/10 text-orange-500'}`}>
+                                   <div className={`size-10 rounded-xl flex items-center justify-center ${tx.type === 'deposit' ? 'bg-primary/5 text-primary' : 'bg-orange-500/10 text-orange-600'}`}>
                                       {tx.type === 'deposit' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
                                    </div>
                                    <div>
                                       <p className="font-bold text-white uppercase italic tracking-tighter text-sm">{tx.userName}</p>
-                                      <p className="text-[10px] text-zinc-600 font-mono">{format(tx.createdAt?.toDate() || new Date(), 'MMM dd, HH:mm')}</p>
+                                      <p className="text-[10px] text-white/40 font-mono italic">{format(tx.createdAt?.toDate() || new Date(), 'MMM dd, HH:mm')}</p>
                                    </div>
                                 </div>
                                 <div className="text-right">
-                                   <p className={`font-black italic text-lg ${tx.type === 'deposit' ? 'text-blue-500' : 'text-orange-500'}`}>${tx.amount?.toLocaleString()}</p>
-                                   <Badge className={`text-[8px] font-black rounded-md ${tx.status === 'pending' ? 'bg-primary text-black' : tx.status === 'approved' ? 'bg-green-500 text-black' : 'bg-red-500 text-white'}`}>
+                                   <p className={`font-black italic text-lg ${tx.type === 'deposit' ? 'text-primary' : 'text-orange-600'}`}>${tx.amount?.toLocaleString()}</p>
+                                   <Badge className={`text-[8px] font-black rounded-md border-none ${tx.status === 'pending' ? 'bg-primary text-primary-foreground' : tx.status === 'approved' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                       {tx.status}
                                    </Badge>
                                 </div>
                              </div>
                            ))}
-                           {transactions.length === 0 && <div className="p-20 text-center text-zinc-800 italic uppercase font-black text-xs">No records found</div>}
+                           {transactions.length === 0 && <div className="p-20 text-center text-slate-300 italic uppercase font-black text-xs">No records found</div>}
                         </div>
                      </CardContent>
                   </Card>
 
-                  <Card className="bg-[#080808] border-zinc-900 rounded-3xl overflow-hidden p-8 flex flex-col items-center justify-center text-center space-y-6">
+                  <Card className="bg-card border-border rounded-3xl overflow-hidden p-8 flex flex-col items-center justify-center text-center space-y-6 shadow-md">
                      <div className="size-24 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
                         <Activity size={40} className="text-primary animate-pulse" />
                      </div>
                      <div className="space-y-1">
-                        <h3 className="text-xl font-black italic gold-text uppercase underline decoration-primary/50 decoration-2 underline-offset-4">Security Log</h3>
-                        <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest max-w-[200px] mt-2">Always verify screenshots before final approval</p>
+                        <h3 className="text-xl font-black italic vibrant-text uppercase underline decoration-primary/50 decoration-2 underline-offset-4">Security Log</h3>
+                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest max-w-[200px] mt-2 leading-relaxed">Always verify screenshots before final approval</p>
                      </div>
-                     <div className="w-full space-y-3 pt-4 border-t border-zinc-900/50">
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                     <div className="w-full space-y-3 pt-4 border-t border-border">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                            <span>Daily Growth</span>
-                           <span className="text-green-500 font-black">+ 15.2%</span>
+                           <span className="text-green-600 font-black">+ 15.2%</span>
                         </div>
-                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                        <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-slate-400">
                            <span>New Members</span>
                            <span className="text-white font-black">{users.filter(u => (Date.now() - (u.createdAt?.toDate() || 0)) < 86400000).length} Today</span>
                         </div>
@@ -569,58 +569,58 @@ export default function AdminDashboard() {
       {/* Search Header */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
          <div className="relative w-full md:w-96">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-zinc-500" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-white/40" />
             <Input 
                placeholder="Search User by Name or Email..." 
-               className="bg-[#0c0c0c] border-[#1a1a1a] h-14 pl-12 rounded-2xl focus:ring-1 focus:ring-primary/40 text-sm text-white placeholder:text-zinc-700"
+               className="bg-background border-border h-14 pl-12 rounded-2xl focus:ring-1 focus:ring-primary/40 text-sm text-white placeholder:text-white/40 shadow-sm"
                value={searchTerm}
                onChange={(e) => setSearchTerm(e.target.value)}
             />
          </div>
-         <div className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.2em]">{filteredUsers.length} TOTAL USERS</div>
+         <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">{filteredUsers.length} TOTAL USERS</div>
       </div>
 
-               <Card className="bg-[#080808] border-zinc-900 rounded-3xl overflow-hidden shadow-2xl">
+               <Card className="bg-card border-border rounded-3xl overflow-hidden shadow-md">
                   <div className="overflow-x-auto">
                      <table className="w-full text-left">
-                        <thead className="bg-zinc-950/50 border-b border-zinc-900">
+                        <thead className="bg-white/5 border-b border-border">
                            <tr>
-                              <th className="p-6 text-[10px] font-black uppercase text-zinc-600">User Profile</th>
-                              <th className="p-6 text-[10px] font-black uppercase text-zinc-600">Balance Status</th>
-                              <th className="p-6 text-[10px] font-black uppercase text-zinc-600">Referral ID</th>
-                              <th className="p-6 text-[10px] font-black uppercase text-zinc-600">Site Status</th>
-                              <th className="p-6 text-right text-[10px] font-black uppercase text-zinc-600">Actions</th>
+                              <th className="p-6 text-[10px] font-black uppercase text-white/40">User Profile</th>
+                              <th className="p-6 text-[10px] font-black uppercase text-white/40">Balance Status</th>
+                              <th className="p-6 text-[10px] font-black uppercase text-white/40">Referral ID</th>
+                              <th className="p-6 text-[10px] font-black uppercase text-white/40">Site Status</th>
+                              <th className="p-6 text-right text-[10px] font-black uppercase text-white/40">Actions</th>
                            </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-900/30">
+                        <tbody className="divide-y divide-border">
                            {filteredUsers.map(u => (
-                             <tr key={u.id} className="hover:bg-zinc-900/10 transition-all group">
+                             <tr key={u.id} className="hover:bg-white/5 transition-all group">
                                 <td className="p-6">
                                    <div className="flex items-center gap-4">
-                                      <div className="size-12 rounded-2xl bg-zinc-950 border border-zinc-900 flex items-center justify-center font-black italic text-primary text-xl">
+                                      <div className="size-12 rounded-2xl bg-white/5 border border-border flex items-center justify-center font-black italic text-primary text-xl">
                                          {u.displayName?.[0]?.toUpperCase() || 'U'}
                                       </div>
                                       <div>
                                          <p className="font-black text-white italic text-base group-hover:text-primary transition-colors">{u.displayName}</p>
-                                         <p className="text-[10px] text-zinc-600 font-mono tracking-tight font-bold">{u.email}</p>
+                                         <p className="text-[10px] text-white/40 font-mono tracking-tight font-bold italic">{u.email}</p>
                                       </div>
                                    </div>
                                 </td>
                                 <td className="p-6">
                                    <p className="text-xl font-black italic text-white font-mono">${u.balance?.toLocaleString() || '0'}</p>
-                                   <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mt-1">Available Funds</p>
+                                   <p className="text-[9px] text-white/40 font-bold uppercase tracking-widest mt-1">Available Funds</p>
                                 </td>
                                 <td className="p-6">
-                                   <p className="text-xs font-mono font-bold text-zinc-500 select-all">{u.referralCode || 'NONE'}</p>
+                                   <p className="text-xs font-mono font-bold text-white/40 select-all">{u.referralCode || 'NONE'}</p>
                                 </td>
                                 <td className="p-6">
-                                   <Badge className={`uppercase text-[9px] font-black px-2 py-0.5 rounded-md ${u.status === 'active' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                                   <Badge className={`uppercase text-[9px] font-black px-2 py-0.5 rounded-md border-none ${u.status === 'active' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                       {u.status}
                                    </Badge>
                                 </td>
                                 <td className="p-6 text-right">
                                    <div className="flex items-center justify-end gap-3">
-                                      <Button size="sm" variant="outline" className="h-10 border-zinc-800 bg-zinc-950 text-[10px] font-black uppercase rounded-xl hover:bg-zinc-900" onClick={() => handleModifyBalance(u)}>
+                                      <Button size="sm" variant="outline" className="h-10 border-border bg-background text-[10px] font-black uppercase rounded-xl hover:bg-white/5 text-white" onClick={() => handleModifyBalance(u)}>
                                          Set Balance
                                       </Button>
                                       <Button 
@@ -647,61 +647,61 @@ export default function AdminDashboard() {
             <div className="space-y-10">
                <div className="flex items-center justify-between">
                   <header>
-                    <h2 className="text-3xl font-black italic gold-text tracking-tighter uppercase underline decoration-primary/50 decoration-4 underline-offset-8">Investment Plans</h2>
-                    <p className="text-zinc-600 font-bold text-[10px] uppercase tracking-widest mt-4">Manage plans users can invest in</p>
+                    <h2 className="text-3xl font-black italic vibrant-text tracking-tighter uppercase underline decoration-primary/50 decoration-4 underline-offset-8">Investment Plans</h2>
+                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-4">Manage plans users can invest in</p>
                   </header>
-                  <Button onClick={() => { setEditingPlan(null); setIsPlanModalOpen(true); }} className="bg-primary text-black font-black uppercase text-xs h-12 px-8 rounded-2xl gold-glow hover:scale-105 transition-all">
+                  <Button onClick={() => { setEditingPlan(null); setIsPlanModalOpen(true); }} className="bg-primary text-primary-foreground font-black uppercase text-xs h-12 px-8 rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-all">
                      <Plus className="mr-2 size-5" /> New Plan
                   </Button>
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {plans.map(plan => (
-                    <Card key={plan.id} className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/50 transition-all shadow-2xl relative gold-glow">
-                       <div className="h-2 w-full bg-zinc-900 group-hover:bg-primary transition-all duration-700" />
-                       <CardContent className="p-8">
-                          <div className="flex justify-between items-start mb-8">
-                             <div>
-                                <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-primary transition-colors">{plan.name}</h3>
-                                <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mt-1">GOLDBRICK MASTER PLAN</p>
-                             </div>
-                          </div>
+                      <Card key={plan.id} className="bg-card border-border rounded-[2.5rem] overflow-hidden group hover:border-primary/50 transition-all shadow-md relative border">
+                        <div className="h-2 w-full bg-white/5 group-hover:bg-primary transition-all duration-700" />
+                        <CardContent className="p-8">
+                           <div className="flex justify-between items-start mb-8">
+                              <div>
+                                 <h3 className="text-2xl font-black italic uppercase tracking-tighter group-hover:text-primary transition-colors text-white">{plan.name}</h3>
+                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">GOLDBRICK MASTER PLAN</p>
+                              </div>
+                           </div>
 
-                          <div className="grid grid-cols-2 gap-4 font-mono">
-                             <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
-                                <p className="text-[8px] uppercase tracking-widest text-zinc-600 mb-1">Yield / ROI</p>
-                                <p className="text-xl text-green-500 font-black italic">
-                                  {plan.profitType === 'fixed' ? `$${plan.profitValue}` : `${plan.profitValue || plan.dailyROI || 0}%`}
-                                </p>
-                             </div>
-                             <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-900">
-                                <p className="text-[8px] uppercase tracking-widest text-zinc-600 mb-1">Duration</p>
-                                <p className="text-xl text-white font-black italic">{plan.durationDays ? `${plan.durationDays}d` : `${plan.durationHours || 0}h`}</p>
-                             </div>
-                             <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-900 col-span-2">
-                                <p className="text-[8px] uppercase tracking-widest text-zinc-600 mb-1">Entry Amount</p>
-                                <p className="text-base text-white font-black italic">${plan.minDeposit?.toLocaleString()} - ${plan.maxDeposit?.toLocaleString()}</p>
-                             </div>
-                          </div>
+                           <div className="grid grid-cols-2 gap-4 font-mono">
+                              <div className="p-4 bg-white/5 rounded-2xl border border-border">
+                                 <p className="text-[8px] uppercase tracking-widest text-slate-400 mb-1">Yield / ROI</p>
+                                 <p className="text-xl text-green-600 font-black italic">
+                                   {plan.profitType === 'fixed' ? `$${plan.profitValue}` : `${plan.profitValue || plan.dailyROI || 0}%`}
+                                 </p>
+                              </div>
+                              <div className="p-4 bg-white/5 rounded-2xl border border-border">
+                                 <p className="text-[8px] uppercase tracking-widest text-slate-400 mb-1">Duration</p>
+                                 <p className="text-xl text-white font-black italic">{plan.durationDays ? `${plan.durationDays}d` : `${plan.durationHours || 0}h`}</p>
+                              </div>
+                              <div className="p-4 bg-white/5 rounded-2xl border border-border col-span-2">
+                                 <p className="text-[8px] uppercase tracking-widest text-slate-400 mb-1">Entry Amount</p>
+                                 <p className="text-base text-white font-black italic">${plan.minDeposit?.toLocaleString()} - ${plan.maxDeposit?.toLocaleString()}</p>
+                              </div>
+                           </div>
 
-                          <div className="mt-8 flex gap-3">
-                             <Button 
-                               className="flex-1 h-12 bg-zinc-900 border border-zinc-800 text-primary font-black uppercase text-[10px] rounded-2xl hover:bg-primary hover:text-black transition-all gap-2 shadow-xl" 
-                               onClick={() => { setEditingPlan(plan); setIsPlanModalOpen(true); }}
-                             >
-                                <Edit2 size={14} /> Edit Plan Settings
-                             </Button>
-                             <Button 
-                               variant="ghost"
-                               size="icon"
-                               className="h-12 w-12 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-xl"
-                               onClick={() => handleDeletePlan(plan.id)}
-                             >
-                                <Trash2 size={16} />
-                             </Button>
-                          </div>
-                       </CardContent>
-                    </Card>
+                           <div className="mt-8 flex gap-3">
+                              <Button 
+                                className="flex-1 h-12 bg-background border border-border text-primary font-black uppercase text-[10px] rounded-2xl hover:bg-primary hover:text-primary-foreground transition-all gap-2 shadow-sm" 
+                                onClick={() => { setEditingPlan(plan); setIsPlanModalOpen(true); }}
+                              >
+                                 <Edit2 size={14} /> Edit Plan Settings
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="icon"
+                                className="h-12 w-12 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm border border-transparent hover:border-red-500"
+                                onClick={() => handleDeletePlan(plan.id)}
+                              >
+                                 <Trash2 size={16} />
+                              </Button>
+                           </div>
+                        </CardContent>
+                     </Card>
                   ))}
                </div>
             </div>
@@ -710,15 +710,15 @@ export default function AdminDashboard() {
           {/* Deposit Section */}
           {activeSection === 'deposit' && (
             <div className="space-y-8">
-               <Card className="bg-[#080808] border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                  <CardHeader className="bg-zinc-900/10 p-8 border-b border-zinc-900">
-                      <CardTitle className="text-2xl font-black italic gold-text tracking-tighter uppercase italic">Deposit Approvals</CardTitle>
-                      <CardDescription className="text-zinc-600 font-bold text-[10px] uppercase tracking-widest mt-1 font-mono">Verify and approve money deposits</CardDescription>
+               <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-md border">
+                  <CardHeader className="bg-white/5 p-8 border-b border-border">
+                      <CardTitle className="text-2xl font-black italic vibrant-text tracking-tighter uppercase">Deposit Approvals</CardTitle>
+                      <CardDescription className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1 font-mono">Verify and approve money deposits</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                       <div className="overflow-x-auto">
                          <table className="w-full text-left">
-                            <thead className="bg-zinc-950 text-zinc-500 text-[10px] font-black uppercase tracking-widest">
+                            <thead className="bg-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest">
                                <tr>
                                   <th className="p-6">Date</th>
                                   <th className="p-6">User</th>
@@ -728,38 +728,38 @@ export default function AdminDashboard() {
                                   <th className="p-6 text-right">Actions</th>
                                </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-900/30">
+                            <tbody className="divide-y divide-border">
                                {transactions.filter(t => t.type === 'deposit').map(tx => (
-                                 <tr key={tx.id} className="hover:bg-zinc-900/10 transition-all group">
-                                    <td className="p-6 text-[10px] font-mono font-bold text-zinc-500">
+                                 <tr key={tx.id} className="hover:bg-white/5 transition-all group">
+                                    <td className="p-6 text-[10px] font-mono font-bold text-slate-400">
                                        {tx.createdAt ? format(tx.createdAt.toDate(), 'MMM dd, HH:mm') : 'Now'}
                                     </td>
                                     <td className="p-6">
                                        <p className="font-black text-white italic uppercase tracking-tighter group-hover:text-primary transition-colors">{tx.userName}</p>
-                                       <p className="text-[10px] text-zinc-600 font-mono tracking-tight">{tx.userEmail}</p>
+                                       <p className="text-[10px] text-slate-400 font-mono tracking-tight font-bold italic">{tx.userEmail}</p>
                                     </td>
                                     <td className="p-6">
-                                       <p className="text-2xl font-black italic text-blue-500 tracking-tighter font-mono">${tx.amount?.toLocaleString()}</p>
+                                       <p className="text-2xl font-black italic text-primary tracking-tighter font-mono">${tx.amount?.toLocaleString()}</p>
                                     </td>
-                                    <td className="p-6 text-[10px] font-black uppercase italic text-zinc-500">
+                                    <td className="p-6 text-[10px] font-black uppercase italic text-slate-400">
                                        {tx.currency} ({tx.network})
                                     </td>
                                     <td className="p-6">
-                                       <Badge className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${tx.status === 'pending' ? 'bg-primary text-black animate-pulse' : tx.status === 'approved' ? 'bg-green-500 text-black' : 'bg-red-500 text-white'}`}>
+                                       <Badge className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border-none ${tx.status === 'pending' ? 'bg-primary text-primary-foreground animate-pulse' : tx.status === 'approved' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                           {tx.status}
                                        </Badge>
                                     </td>
                                     <td className="p-6 text-right">
                                        <div className="flex items-center justify-end gap-3">
-                                          <Button size="icon" variant="ghost" className="size-10 rounded-xl bg-zinc-950 border border-zinc-900 hover:bg-zinc-900" onClick={() => { setSelectedTx(tx); setIsReceiptOpen(true); }}>
+                                          <Button size="icon" variant="ghost" className="size-10 rounded-xl bg-background border border-border hover:bg-white/5 text-slate-500" onClick={() => { setSelectedTx(tx); setIsReceiptOpen(true); }}>
                                              <Eye size={18} />
                                           </Button>
                                           {tx.status === 'pending' && (
                                             <>
-                                              <Button size="icon" className="size-10 rounded-xl bg-green-600 hover:bg-green-700 shadow-lg shadow-green-900/20" onClick={() => handleApproveTransaction(tx)}>
+                                              <Button size="icon" className="size-10 rounded-xl bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200" onClick={() => handleApproveTransaction(tx)}>
                                                  <Check size={18} />
                                               </Button>
-                                              <Button size="icon" className="size-10 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-900/20" onClick={() => handleRejectTransaction(tx)}>
+                                              <Button size="icon" className="size-10 rounded-xl bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-200" onClick={() => handleRejectTransaction(tx)}>
                                                  <X size={18} />
                                               </Button>
                                             </>
@@ -779,15 +779,15 @@ export default function AdminDashboard() {
           {/* Withdrawal Section */}
           {activeSection === 'withdrawal' && (
             <div className="space-y-8">
-               <Card className="bg-[#080808] border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                  <CardHeader className="bg-zinc-900/10 p-8 border-b border-zinc-900">
-                      <CardTitle className="text-2xl font-black italic gold-text tracking-tighter uppercase italic">Withdraw Approvals</CardTitle>
-                      <CardDescription className="text-zinc-600 font-bold text-[10px] uppercase tracking-widest mt-1 font-mono">Approve or reject money withdrawals</CardDescription>
+               <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-md border">
+                  <CardHeader className="bg-white/5 p-8 border-b border-border">
+                      <CardTitle className="text-2xl font-black italic vibrant-text tracking-tighter uppercase italic">Withdraw Approvals</CardTitle>
+                      <CardDescription className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-1 font-mono">Approve or reject money withdrawals</CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
                       <div className="overflow-x-auto">
                          <table className="w-full text-left">
-                            <thead className="bg-zinc-950 text-zinc-500 text-[10px] font-black uppercase tracking-widest">
+                            <thead className="bg-white/5 text-slate-400 text-[10px] font-black uppercase tracking-widest">
                                <tr>
                                   <th className="p-6">Date</th>
                                   <th className="p-6">User</th>
@@ -797,27 +797,27 @@ export default function AdminDashboard() {
                                   <th className="p-6 text-right">Actions</th>
                                </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-900/30">
+                            <tbody className="divide-y divide-border">
                                {transactions.filter(t => t.type === 'withdrawal').map(tx => (
-                                 <tr key={tx.id} className="hover:bg-zinc-900/10 transition-all group">
-                                    <td className="p-6 text-[10px] font-mono font-bold text-zinc-500">
+                                 <tr key={tx.id} className="hover:bg-white/5 transition-all group">
+                                    <td className="p-6 text-[10px] font-mono font-bold text-slate-400">
                                        {tx.createdAt ? format(tx.createdAt.toDate(), 'MMM dd, HH:mm') : 'Now'}
                                     </td>
                                     <td className="p-6">
                                        <p className="font-black text-white italic uppercase tracking-tighter group-hover:text-primary transition-colors">{tx.userName}</p>
-                                       <p className="text-[10px] text-zinc-600 font-mono tracking-tight">{tx.userEmail}</p>
+                                       <p className="text-[10px] text-slate-400 font-mono tracking-tight font-bold italic">{tx.userEmail}</p>
                                     </td>
                                     <td className="p-6">
-                                       <p className="text-2xl font-black italic text-orange-500 tracking-tighter font-mono">${tx.amount?.toLocaleString()}</p>
+                                       <p className="text-2xl font-black italic text-orange-600 tracking-tighter font-mono">${tx.amount?.toLocaleString()}</p>
                                     </td>
                                     <td className="p-6">
                                        <div className="max-w-[150px]">
-                                          <p className="text-[9px] font-black text-zinc-500 uppercase italic mb-1">{tx.currency} Wallet</p>
-                                          <p className="text-[8px] font-mono text-zinc-600 truncate bg-black/50 p-2 rounded-lg border border-zinc-900 select-all" title={tx.walletAddress}>{tx.walletAddress || 'No Address'}</p>
+                                          <p className="text-[9px] font-black text-slate-400 uppercase italic mb-1">{tx.currency} Wallet</p>
+                                          <p className="text-[8px] font-mono text-slate-300 truncate bg-background p-2 rounded-lg border border-border select-all" title={tx.walletAddress}>{tx.walletAddress || 'No Address'}</p>
                                        </div>
                                     </td>
                                     <td className="p-6">
-                                       <Badge className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${tx.status === 'pending' ? 'bg-primary text-black animate-pulse' : tx.status === 'approved' ? 'bg-green-500 text-black' : 'bg-red-500 text-white'}`}>
+                                       <Badge className={`rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border-none ${tx.status === 'pending' ? 'bg-primary text-primary-foreground animate-pulse' : tx.status === 'approved' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                                           {tx.status}
                                        </Badge>
                                     </td>
@@ -825,10 +825,10 @@ export default function AdminDashboard() {
                                        <div className="flex items-center justify-end gap-3">
                                           {tx.status === 'pending' && (
                                             <>
-                                              <Button size="icon" className="size-10 rounded-xl bg-green-600 hover:bg-green-700 shadow-lg shadow-green-900/20" onClick={() => handleApproveTransaction(tx)}>
+                                              <Button size="icon" className="size-10 rounded-xl bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200" onClick={() => handleApproveTransaction(tx)}>
                                                  <Check size={18} />
                                               </Button>
-                                              <Button size="icon" className="size-10 rounded-xl bg-red-600 hover:bg-red-700 shadow-lg shadow-red-900/20" onClick={() => handleRejectTransaction(tx)}>
+                                              <Button size="icon" className="size-10 rounded-xl bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-200" onClick={() => handleRejectTransaction(tx)}>
                                                  <X size={18} />
                                               </Button>
                                             </>
@@ -857,39 +857,39 @@ export default function AdminDashboard() {
             <div className="space-y-10">
                <div className="flex items-center justify-between">
                   <header>
-                    <h2 className="text-3xl font-black italic gold-text tracking-tighter uppercase underline decoration-primary/50 decoration-4 underline-offset-8">Crypto Wallets</h2>
-                    <p className="text-zinc-600 font-bold text-[10px] uppercase tracking-widest mt-4">Manage addresses where users send their deposits</p>
+                    <h2 className="text-3xl font-black italic vibrant-text tracking-tighter uppercase underline decoration-primary/50 decoration-4 underline-offset-8">Crypto Wallets</h2>
+                    <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mt-4">Manage addresses where users send their deposits</p>
                   </header>
                   <Button onClick={() => {
                       setEditingWallet(null);
                       setIsWalletModalOpen(true);
-                  }} className="bg-primary text-black font-black uppercase text-xs h-12 px-8 rounded-2xl gold-glow hover:scale-105 transition-all">
+                  }} className="bg-primary text-primary-foreground font-black uppercase text-xs h-12 px-8 rounded-2xl shadow-lg shadow-primary/20 hover:scale-105 transition-all">
                      <Plus className="mr-2 size-5" /> Add New Wallet
                   </Button>
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {wallets.map(w => (
-                    <Card key={w.id} className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/50 transition-all shadow-2xl relative">
-                       <div className="h-2 w-full bg-zinc-900 group-hover:bg-primary transition-all duration-700" />
+                    <Card key={w.id} className="bg-card border-border rounded-[2rem] overflow-hidden group hover:border-primary/50 transition-all shadow-md relative border">
+                       <div className="h-2 w-full bg-white/5 group-hover:bg-primary transition-all duration-700" />
                        <CardContent className="p-8">
                           <div className="flex justify-between items-start mb-6">
                              <div className="flex items-center gap-4">
-                                <div className="size-16 rounded-2xl bg-white p-1 border-2 border-primary/20 shadow-xl overflow-hidden flex items-center justify-center">
+                                <div className="size-16 rounded-2xl bg-white p-1 border-2 border-primary/10 shadow-sm overflow-hidden flex items-center justify-center">
                                    {w.qrCodeUrl ? (
                                      <img src={w.qrCodeUrl} alt="QR" className="w-full h-full object-contain" />
                                    ) : (
-                                     <QrCode className="text-black size-8" />
+                                     <QrCode className="text-slate-200 size-8" />
                                    )}
                                 </div>
                                 <div>
                                    <h3 className="text-xl font-black italic uppercase tracking-tighter text-white group-hover:text-primary transition-colors">{w.currency}</h3>
-                                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{w.network} NETWORK</p>
+                                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{w.network} NETWORK</p>
                                 </div>
                              </div>
                               <div className="flex flex-col gap-2 w-full">
                                  <Button 
-                                   className="h-12 bg-zinc-900 border border-zinc-800 text-primary font-black uppercase text-[10px] rounded-2xl hover:bg-primary hover:text-black transition-all gap-3 px-6 shadow-xl" 
+                                   className="h-12 bg-background border border-border text-primary font-black uppercase text-[10px] rounded-2xl hover:bg-primary hover:text-primary-foreground transition-all gap-3 px-6 shadow-sm" 
                                    onClick={() => {
                                      setEditingWallet(w);
                                      setIsWalletModalOpen(true);
@@ -899,7 +899,7 @@ export default function AdminDashboard() {
                                  </Button>
                                  <Button 
                                    variant="ghost"
-                                   className="h-10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl text-[9px] font-black uppercase transition-all"
+                                   className="h-10 text-red-500 hover:bg-red-500/10 hover:text-red-600 rounded-xl text-[9px] font-black uppercase transition-all"
                                    onClick={() => handleDeleteWallet(w.id)}
                                  >
                                     <Trash2 size={12} className="mr-2" /> Delete Wallet
@@ -907,9 +907,9 @@ export default function AdminDashboard() {
                               </div>
                           </div>
 
-                          <div className="bg-black p-4 rounded-xl border border-zinc-900">
-                             <p className="text-[9px] font-black text-zinc-600 uppercase mb-2">Public Address</p>
-                             <p className="text-[11px] font-mono text-zinc-400 break-all bg-zinc-950 p-3 rounded-lg border border-zinc-800 select-all">{w.address}</p>
+                          <div className="bg-white/5 p-4 rounded-xl border border-border">
+                             <p className="text-[9px] font-black text-slate-400 uppercase mb-2">Public Address</p>
+                             <p className="text-[11px] font-mono text-slate-300 break-all bg-background p-3 rounded-lg border border-border select-all">{w.address}</p>
                           </div>
                        </CardContent>
                     </Card>
@@ -922,28 +922,28 @@ export default function AdminDashboard() {
           {activeSection === 'settings' && (
             <div className="space-y-10 pb-10">
                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <Card className="bg-[#080808] border-zinc-900 rounded-3xl overflow-hidden shadow-2xl gold-glow border-t-4 border-t-primary">
-                      <CardHeader className="p-8 border-b border-zinc-900 bg-zinc-900/10">
-                         <CardTitle className="text-lg font-black uppercase italic tracking-tighter flex items-center gap-3">
+                  <Card className="bg-card border-border rounded-3xl overflow-hidden shadow-md border-t-4 border-t-primary border">
+                      <CardHeader className="p-8 border-b border-border bg-white/5">
+                         <CardTitle className="text-lg font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
                            <CreditCard className="size-5 text-primary" /> Withdrawal Rules
                          </CardTitle>
                       </CardHeader>
                       <CardContent className="p-8 space-y-6">
              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-3">
-                   <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Min Amount ($)</Label>
+                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Min Amount ($)</Label>
                    <Input 
                      type="number" 
-                     className="bg-[#0c0c0c] border-zinc-800 h-14 font-black italic text-lg px-4 rounded-xl text-white placeholder:text-zinc-800" 
+                     className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl text-white placeholder:text-slate-200" 
                      value={config.minWithdrawal}
                      onChange={(e) => setConfig({...config, minWithdrawal: parseFloat(e.target.value)})}
                    />
                 </div>
                 <div className="space-y-3">
-                   <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Max Amount ($)</Label>
+                   <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Max Amount ($)</Label>
                    <Input 
                      type="number" 
-                     className="bg-[#0c0c0c] border-zinc-800 h-14 font-black italic text-lg px-4 rounded-xl text-white placeholder:text-zinc-800" 
+                     className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl text-white placeholder:text-slate-200" 
                      value={config.maxWithdrawal}
                      onChange={(e) => setConfig({...config, maxWithdrawal: parseFloat(e.target.value)})}
                    />
@@ -951,11 +951,11 @@ export default function AdminDashboard() {
              </div>
                          <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-3">
-                               <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Withdraw Fee</Label>
+                               <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Withdraw Fee</Label>
                                <div className="flex gap-2">
                                   <Input 
                                     type="number" 
-                                    className="bg-[#0c0c0c] border-[#1a1a1a] h-14 flex-1 font-black italic text-lg px-4 rounded-xl text-white" 
+                                    className="bg-background border-border h-14 flex-1 font-black italic text-lg px-4 rounded-xl text-white" 
                                     value={config.withdrawalFee}
                                     onChange={(e) => setConfig({...config, withdrawalFee: parseFloat(e.target.value)})}
                                   />
@@ -963,10 +963,10 @@ export default function AdminDashboard() {
                                     value={config.withdrawalFeeType} 
                                     onValueChange={(val) => setConfig({...config, withdrawalFeeType: val})}
                                   >
-                                    <SelectTrigger className="w-20 bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black text-xs rounded-xl text-white">
+                                    <SelectTrigger className="w-20 bg-background border-border h-14 font-black text-xs rounded-xl text-white">
                                        <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-zinc-950 border-zinc-900 text-white">
+                                    <SelectContent className="bg-card border-border text-white">
                                        <SelectItem value="percentage">%</SelectItem>
                                        <SelectItem value="fixed">$</SelectItem>
                                     </SelectContent>
@@ -974,10 +974,10 @@ export default function AdminDashboard() {
                                </div>
                             </div>
                             <div className="space-y-3">
-                               <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Referral Bonus ($)</Label>
+                               <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Referral Bonus ($)</Label>
                                <Input 
                                  type="number" 
-                                 className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl text-white" 
+                                 className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl text-white" 
                                  value={config.referralBonus}
                                  onChange={(e) => setConfig({...config, referralBonus: parseFloat(e.target.value)})}
                                />
@@ -986,35 +986,35 @@ export default function AdminDashboard() {
                       </CardContent>
                   </Card>
 
-                  <Card className="bg-[#080808] border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl gold-glow">
-                      <CardHeader className="p-8 border-b border-zinc-900 bg-zinc-900/10">
-                         <CardTitle className="text-lg font-black uppercase italic tracking-tighter flex items-center gap-3">
+                  <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-md border">
+                      <CardHeader className="p-8 border-b border-border bg-white/5">
+                         <CardTitle className="text-lg font-black uppercase italic tracking-tighter flex items-center gap-3 text-white">
                            <Globe className="size-5 text-primary" /> Contact & Information
                          </CardTitle>
                       </CardHeader>
                       <CardContent className="p-8 space-y-6">
                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">WhatsApp Group Link</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">WhatsApp Group Link</Label>
                             <Input 
                               placeholder="https://chat.whatsapp.com/..." 
-                              className="bg-[#0c0c0c] border-[#1a1a1a] h-14 px-4 rounded-xl font-medium text-white placeholder:text-zinc-800" 
+                              className="bg-background border-border h-14 px-4 rounded-xl font-medium text-white placeholder:text-slate-400" 
                               value={config.whatsappLink}
                               onChange={(e) => setConfig({...config, whatsappLink: e.target.value})}
                             />
                          </div>
                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Admin Chat Link (Support Page)</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Admin Chat Link (Support Page)</Label>
                             <Input 
                               placeholder="https://t.me/admin or support link" 
-                              className="bg-[#0c0c0c] border-[#1a1a1a] h-14 px-4 rounded-xl font-medium text-white placeholder:text-zinc-800" 
+                              className="bg-background border-border h-14 px-4 rounded-xl font-medium text-white placeholder:text-slate-400" 
                               value={config.contactLink}
                               onChange={(e) => setConfig({...config, contactLink: e.target.value})}
                             />
                          </div>
                          <div className="space-y-3">
-                            <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Deposit Receipt Instructions</Label>
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Deposit Receipt Instructions</Label>
                             <textarea 
-                               className="w-full bg-[#0c0c0c] border-[#1a1a1a] p-4 rounded-xl font-medium text-white placeholder:text-zinc-800 h-32 focus:outline-none focus:ring-1 focus:ring-primary/40 text-sm"
+                               className="w-full bg-background border-border p-4 rounded-xl font-medium text-white placeholder:text-slate-400 h-32 focus:outline-none focus:ring-1 focus:ring-primary/40 text-sm shadow-sm"
                                placeholder="Instructions shown to users on deposit page..."
                                value={config.depositInstruction}
                                onChange={(e) => setConfig({...config, depositInstruction: e.target.value})}
@@ -1025,7 +1025,7 @@ export default function AdminDashboard() {
                </div>
 
                <div className="flex justify-center">
-                  <Button className="w-full max-w-sm h-16 bg-primary text-black font-black uppercase text-sm rounded-3xl gold-glow hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
+                  <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
                      Save All Settings <Check className="ml-2 size-5" />
                   </Button>
                </div>
@@ -1036,35 +1036,35 @@ export default function AdminDashboard() {
 
       {/* Detail Modal */}
       <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-        <DialogContent className="bg-[#080808] border-zinc-900 text-zinc-300 max-w-lg rounded-[2.5rem] p-0 overflow-hidden shadow-2xl gold-glow">
-           <DialogHeader className="p-8 bg-zinc-900/70 border-b border-zinc-900 text-center">
-              <DialogTitle className="text-2xl font-black italic gold-text uppercase">Audit Transaction</DialogTitle>
+        <DialogContent className="bg-card border-border text-slate-500 max-w-lg rounded-[2.5rem] p-0 overflow-hidden shadow-2xl border">
+           <DialogHeader className="p-8 bg-white/5 border-b border-border text-center">
+              <DialogTitle className="text-2xl font-black italic vibrant-text uppercase">Audit Transaction</DialogTitle>
            </DialogHeader>
            
            <div className="p-8 space-y-6 max-h-[60vh] overflow-y-auto no-scrollbar">
               {selectedTx && (
                 <div className="space-y-6">
-                   <div className="grid grid-cols-2 gap-4 bg-black p-6 rounded-2xl border border-zinc-900">
+                   <div className="grid grid-cols-2 gap-4 bg-white/5 p-6 rounded-2xl border border-border">
                       <div>
-                         <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">Status</p>
-                         <Badge className={`rounded-md px-2 text-[9px] uppercase font-black ${selectedTx.status === 'pending' ? 'bg-primary text-black' : selectedTx.status === 'approved' ? 'bg-green-500 text-black' : 'bg-red-500 text-white'}`}>
+                         <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Status</p>
+                         <Badge className={`rounded-md px-2 text-[9px] uppercase font-black border-none ${selectedTx.status === 'pending' ? 'bg-primary text-primary-foreground' : selectedTx.status === 'approved' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
                             {selectedTx.status}
                          </Badge>
                       </div>
                       <div>
-                         <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">Amount</p>
+                         <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Amount</p>
                          <p className="font-black text-xl italic text-white font-mono">${selectedTx.amount?.toLocaleString()}</p>
                       </div>
                       <div className="col-span-2">
-                         <p className="text-[8px] font-black text-zinc-600 uppercase mb-1">Transaction Hash</p>
-                         <p className="text-[9px] font-mono text-primary break-all bg-zinc-950 p-3 rounded-lg border border-zinc-900">{selectedTx.txHash || 'NOT PROVIDED'}</p>
+                         <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Transaction Hash</p>
+                         <p className="text-[9px] font-mono text-primary break-all bg-background p-3 rounded-lg border border-border italic font-bold">{selectedTx.txHash || 'NOT PROVIDED'}</p>
                       </div>
                    </div>
 
                    {selectedTx.receiptUrl && (
                      <div className="space-y-4">
-                        <Label className="text-[9px] font-black uppercase text-center block text-zinc-600">Payment Screenshot</Label>
-                        <div className="rounded-2xl overflow-hidden border-2 border-dashed border-zinc-900 p-2 bg-zinc-950 group">
+                        <Label className="text-[9px] font-black uppercase text-center block text-slate-400">Payment Screenshot</Label>
+                        <div className="rounded-2xl overflow-hidden border-2 border-dashed border-border p-2 bg-white/5 group">
                            <img 
                              src={selectedTx.receiptUrl} 
                              alt="Payment Proof" 
@@ -1072,22 +1072,22 @@ export default function AdminDashboard() {
                              onClick={() => window.open(selectedTx.receiptUrl, '_blank')}
                            />
                         </div>
-                        <p className="text-[9px] text-zinc-700 text-center uppercase font-black">Tap image to view full size</p>
+                        <p className="text-[9px] text-slate-300 text-center uppercase font-black">Tap image to view full size</p>
                      </div>
                    )}
                 </div>
               )}
            </div>
 
-           <DialogFooter className="p-8 border-t border-zinc-900 flex gap-4 bg-zinc-950">
+           <DialogFooter className="p-8 border-t border-border flex gap-4 bg-white/5">
               {selectedTx?.status === 'pending' && (
                 <>
-                  <Button variant="ghost" className="flex-1 h-14 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl font-black uppercase" onClick={() => handleRejectTransaction(selectedTx)}>Reject</Button>
-                  <Button className="flex-1 h-14 bg-green-600 text-white hover:bg-green-700 rounded-2xl font-black uppercase shadow-lg shadow-green-900/20" onClick={() => handleApproveTransaction(selectedTx)}>Approve</Button>
+                   <Button variant="ghost" className="flex-1 h-14 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl font-black uppercase text-xs" onClick={() => handleRejectTransaction(selectedTx)}>Reject</Button>
+                   <Button className="flex-1 h-14 bg-green-500 text-white hover:bg-green-600 rounded-2xl font-black uppercase shadow-lg shadow-green-100 text-xs" onClick={() => handleApproveTransaction(selectedTx)}>Approve</Button>
                 </>
               )}
               {selectedTx?.status !== 'pending' && (
-                <Button className="w-full h-14 bg-zinc-900 border border-zinc-800 text-zinc-500 rounded-2xl font-black uppercase" onClick={() => setIsReceiptOpen(false)}>Close Window</Button>
+                <Button className="w-full h-14 bg-background border border-border text-slate-400 rounded-2xl font-black uppercase text-xs hover:bg-white/5" onClick={() => setIsReceiptOpen(false)}>Close Window</Button>
               )}
            </DialogFooter>
         </DialogContent>
@@ -1095,44 +1095,44 @@ export default function AdminDashboard() {
 
       {/* Plan Modal */}
       <Dialog open={isPlanModalOpen} onOpenChange={setIsPlanModalOpen}>
-        <DialogContent className="bg-[#080808] border-zinc-900 text-zinc-300 rounded-[2.5rem] p-0 overflow-hidden shadow-2xl gold-glow max-w-md">
-           <DialogHeader className="p-8 bg-zinc-900/50 border-b border-zinc-900 text-center">
-              <DialogTitle className="text-3xl font-black italic gold-text uppercase underline decoration-primary decoration-4">Plan Settings</DialogTitle>
+        <DialogContent className="bg-card border-border text-slate-500 rounded-[2.5rem] p-0 overflow-hidden shadow-2xl border max-w-md">
+           <DialogHeader className="p-8 bg-white/5 border-b border-border text-center">
+              <DialogTitle className="text-3xl font-black italic vibrant-text uppercase underline decoration-primary decoration-4">Plan Settings</DialogTitle>
            </DialogHeader>
            
            <form onSubmit={handleSavePlan} className="p-8 space-y-6">
               <div className="space-y-3">
-                 <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Plan Name</Label>
-                 <Input name="name" defaultValue={editingPlan?.name} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl text-white" placeholder="e.g. PREMIUM PLAN" required />
+                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Plan Name</Label>
+                 <Input name="name" defaultValue={editingPlan?.name} className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl text-white" placeholder="e.g. PREMIUM PLAN" required />
               </div>
               <div className="grid grid-cols-2 gap-6">
                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Min Deposit ($)</Label>
-                    <Input name="minDeposit" type="number" defaultValue={editingPlan?.minDeposit} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white" required />
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Min Deposit ($)</Label>
+                    <Input name="minDeposit" type="number" defaultValue={editingPlan?.minDeposit} className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white" required />
                  </div>
                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Max Deposit ($)</Label>
-                    <Input name="maxDeposit" type="number" defaultValue={editingPlan?.maxDeposit} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white" required />
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Max Deposit ($)</Label>
+                    <Input name="maxDeposit" type="number" defaultValue={editingPlan?.maxDeposit} className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white" required />
                  </div>
               </div>
                <div className="grid grid-cols-2 gap-6">
                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Yield Type</Label>
-                    <select name="profitType" defaultValue={editingPlan?.profitType || 'percentage'} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 w-full rounded-xl px-4 text-xs font-black uppercase text-white">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Yield Type</Label>
+                    <select name="profitType" defaultValue={editingPlan?.profitType || 'percentage'} className="bg-background border-border h-14 w-full rounded-xl px-4 text-xs font-black uppercase text-white">
                       <option value="percentage">Percentage (%)</option>
                       <option value="fixed">Fixed Amount ($)</option>
                     </select>
                  </div>
                  <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Yield Value</Label>
-                    <Input name="profitValue" type="number" step="0.1" defaultValue={editingPlan?.profitValue || editingPlan?.dailyROI} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl font-mono text-primary" required />
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Yield Value</Label>
+                    <Input name="profitValue" type="number" step="0.1" defaultValue={editingPlan?.profitValue || editingPlan?.dailyROI} className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl font-mono text-primary" required />
                  </div>
               </div>
               <div className="space-y-3">
-                 <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Duration</Label>
+                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Duration</Label>
                  <div className="flex gap-2">
-                    <Input name="duration" type="number" defaultValue={editingPlan?.durationDays || editingPlan?.durationHours} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white flex-1" required />
-                    <select name="durationUnit" defaultValue={editingPlan?.durationHours ? 'hours' : 'days'} className="bg-[#0c0c0c] border-[#1a1a1a] h-14 rounded-xl px-4 text-[10px] font-black uppercase text-white">
+                    <Input name="duration" type="number" defaultValue={editingPlan?.durationDays || editingPlan?.durationHours} className="bg-background border-border h-14 font-black italic text-lg px-4 rounded-xl font-mono text-white flex-1" required />
+                    <select name="durationUnit" defaultValue={editingPlan?.durationHours ? 'hours' : 'days'} className="bg-background border-border h-14 rounded-xl px-4 text-[10px] font-black uppercase text-white">
                       <option value="days">Days</option>
                       <option value="hours">Hours</option>
                     </select>
@@ -1140,8 +1140,8 @@ export default function AdminDashboard() {
               </div>
               
               <DialogFooter className="pt-6">
-                 <Button type="button" variant="ghost" onClick={() => setIsPlanModalOpen(false)} className="uppercase text-[10px] font-black text-zinc-600">Cancel</Button>
-                 <Button type="submit" className="bg-primary text-black font-black uppercase text-xs h-14 px-8 rounded-2xl gold-glow flex-1">Save Plan</Button>
+                 <Button type="button" variant="ghost" onClick={() => setIsPlanModalOpen(false)} className="uppercase text-[10px] font-black text-slate-400 rounded-xl hover:bg-white/5">Cancel</Button>
+                 <Button type="submit" className="bg-primary text-primary-foreground font-black uppercase text-xs h-14 px-8 rounded-2xl shadow-lg shadow-primary/20 flex-1">Save Plan</Button>
               </DialogFooter>
            </form>
         </DialogContent>
@@ -1149,62 +1149,62 @@ export default function AdminDashboard() {
 
       {/* Wallet Modal */}
       <Dialog open={isWalletModalOpen} onOpenChange={setIsWalletModalOpen}>
-        <DialogContent className="bg-[#080808] border-zinc-900 text-zinc-300 rounded-[2.5rem] p-0 overflow-hidden shadow-2xl gold-glow max-w-md">
-           <DialogHeader className="p-8 bg-zinc-900/50 border-b border-zinc-900 text-center">
-              <DialogTitle className="text-3xl font-black italic gold-text uppercase underline decoration-primary decoration-4">{editingWallet ? 'Edit Wallet' : 'Add Wallet'}</DialogTitle>
+        <DialogContent className="bg-card border-border text-slate-500 rounded-[2.5rem] p-0 overflow-hidden shadow-2xl border max-w-md">
+           <DialogHeader className="p-8 bg-white/5 border-b border-border text-center">
+              <DialogTitle className="text-3xl font-black italic vibrant-text uppercase underline decoration-primary decoration-4">{editingWallet ? 'Edit Wallet' : 'Add Wallet'}</DialogTitle>
            </DialogHeader>
            
            <form key={editingWallet?.id || 'new'} onSubmit={handleSaveWallet} className="p-8 space-y-6">
               <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                   <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Currency Code</Label>
-                   <Input 
-                      value={walletForm.currency} 
-                      onChange={(e) => setWalletForm({...walletForm, currency: e.target.value})}
-                      className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl text-white" 
-                      placeholder="BTC" 
-                      required 
-                   />
-                </div>
-                <div className="space-y-3">
-                   <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Network</Label>
-                   <Input 
-                      value={walletForm.network} 
-                      onChange={(e) => setWalletForm({...walletForm, network: e.target.value})}
-                      className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-lg px-4 rounded-xl text-white" 
-                      placeholder="TRC20" 
-                      required 
-                   />
-                </div>
+                 <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Currency Code</Label>
+                    <input 
+                       value={walletForm.currency} 
+                       onChange={(e) => setWalletForm({...walletForm, currency: e.target.value})}
+                       className="bg-background border border-border h-14 font-black italic text-lg px-4 rounded-xl text-white w-full outline-none focus:ring-1 focus:ring-primary/40" 
+                       placeholder="BTC" 
+                       required 
+                    />
+                 </div>
+                 <div className="space-y-3">
+                    <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Network</Label>
+                    <input 
+                       value={walletForm.network} 
+                       onChange={(e) => setWalletForm({...walletForm, network: e.target.value})}
+                       className="bg-background border border-border h-14 font-black italic text-lg px-4 rounded-xl text-white w-full outline-none focus:ring-1 focus:ring-primary/40" 
+                       placeholder="TRC20" 
+                       required 
+                    />
+                 </div>
               </div>
               <div className="space-y-3">
-                 <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Wallet Address</Label>
-                 <Input 
+                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Wallet Address</Label>
+                 <input 
                     value={walletForm.address} 
                     onChange={(e) => setWalletForm({...walletForm, address: e.target.value})}
-                    className="bg-[#0c0c0c] border-[#1a1a1a] h-14 font-black italic text-sm px-4 rounded-xl text-white font-mono" 
+                    className="bg-background border border-border h-14 font-black italic text-sm px-4 rounded-xl text-white font-mono w-full outline-none focus:ring-1 focus:ring-primary/40" 
                     placeholder="Paste address here" 
                     required 
                  />
               </div>
               <div className="space-y-3">
-                 <Label className="text-[10px] font-black uppercase text-zinc-600 tracking-widest">QR Code Image</Label>
+                 <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">QR Code Image</Label>
                  <div className="flex flex-col gap-3">
-                    <Input 
+                    <input 
                       type="file" 
                       accept="image/*" 
                       onChange={(e) => handleFileUpload(e, 'qrCodeUrl')}
-                      className="bg-[#0c0c0c] border-[#1a1a1a] h-12 text-[10px] font-black uppercase cursor-pointer"
+                      className="bg-background border border-border h-12 text-[10px] font-black uppercase cursor-pointer rounded-xl flex items-center justify-center p-2 text-white"
                     />
-                    <div className="text-[9px] text-zinc-500 font-mono break-all line-clamp-2 bg-black p-2 rounded border border-zinc-900">
+                    <div className="text-[9px] text-slate-400 font-mono break-all line-clamp-2 bg-white/5 p-2 rounded border border-border">
                        {walletForm.qrCodeUrl ? 'Image loaded' : 'No image selected'}
                     </div>
                  </div>
               </div>
               
               <DialogFooter className="pt-6">
-                 <Button type="button" variant="ghost" onClick={() => setIsWalletModalOpen(false)} className="uppercase text-[10px] font-black text-zinc-600">Cancel</Button>
-                 <Button type="submit" className="bg-primary text-black font-black uppercase text-xs h-14 px-8 rounded-2xl gold-glow flex-1">Save Wallet</Button>
+                 <Button type="button" variant="ghost" onClick={() => setIsWalletModalOpen(false)} className="uppercase text-[10px] font-black text-slate-400 rounded-xl hover:bg-white/5">Cancel</Button>
+                 <Button type="submit" className="bg-primary text-primary-foreground font-black uppercase text-xs h-14 px-8 rounded-2xl shadow-lg shadow-primary/20 flex-1">Save Wallet</Button>
               </DialogFooter>
            </form>
         </DialogContent>
@@ -1265,7 +1265,7 @@ function AdminChatManager() {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center h-full text-zinc-700 gap-6">
+    <div className="flex flex-col items-center justify-center h-full text-slate-300 gap-6">
       <div className="size-10 border-2 border-primary border-t-transparent rounded-full animate-spin" />
       <span className="text-[10px] font-black uppercase tracking-[0.4em]">Connecting to Chat...</span>
     </div>
@@ -1273,14 +1273,14 @@ function AdminChatManager() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
-      <Card className="bg-[#080808] border-zinc-900 md:col-span-1 overflow-hidden flex flex-col rounded-[2.5rem] shadow-2xl">
-         <CardHeader className="border-b border-zinc-900 bg-zinc-950 p-6">
-            <CardTitle className="text-[10px] font-black tracking-widest uppercase flex items-center gap-3">
+      <Card className="bg-card border-border md:col-span-1 overflow-hidden flex flex-col rounded-[2.5rem] shadow-md border">
+         <CardHeader className="border-b border-border bg-white/5 p-6">
+            <CardTitle className="text-[10px] font-black tracking-widest uppercase flex items-center gap-3 text-white">
               <MessageSquare className="size-4 text-primary" /> Active User Chats
             </CardTitle>
          </CardHeader>
          <CardContent className="p-0 flex-1 overflow-y-auto no-scrollbar">
-            <div className="divide-y divide-zinc-900/50">
+            <div className="divide-y divide-border">
                {chats.map(chat => (
                   <div 
                     key={chat.id} 
@@ -1290,17 +1290,17 @@ function AdminChatManager() {
                             updateDoc(doc(db, 'chats', chat.id), { unreadByAdmin: false });
                         }
                     }}
-                    className={`p-6 cursor-pointer hover:bg-zinc-900/40 transition-all border-l-4 ${selectedChat?.id === chat.id ? 'bg-zinc-900/60 border-primary' : 'border-transparent'}`}
+                    className={`p-6 cursor-pointer hover:bg-white/5 transition-all border-l-4 ${selectedChat?.id === chat.id ? 'bg-white/5 border-primary' : 'border-transparent'}`}
                   >
                      <div className="flex justify-between items-start mb-2">
                         <div className="font-black text-sm text-white italic uppercase tracking-tighter">{chat.userName}</div>
                         {chat.unreadByAdmin && <div className="size-2 rounded-full bg-primary animate-pulse" />}
                      </div>
-                     <div className="text-[10px] text-zinc-600 font-mono truncate font-bold italic">{chat.lastMessage}</div>
+                     <div className="text-[10px] text-slate-400 font-mono truncate font-bold italic">{chat.lastMessage}</div>
                   </div>
                ))}
                {chats.length === 0 && (
-                 <div className="p-20 text-center text-zinc-800 italic uppercase font-black text-[10px]">
+                 <div className="p-20 text-center text-slate-300 italic uppercase font-black text-[10px]">
                     No messages yet
                  </div>
                )}
@@ -1308,27 +1308,27 @@ function AdminChatManager() {
          </CardContent>
       </Card>
 
-      <Card className="bg-[#080808] border-zinc-900 md:col-span-2 overflow-hidden flex flex-col rounded-[2.5rem] shadow-2xl relative">
+      <Card className="bg-card border-border md:col-span-2 overflow-hidden flex flex-col rounded-[2.5rem] shadow-md border relative">
          {selectedChat ? (
             <>
-               <CardHeader className="border-b border-zinc-900 bg-zinc-950 flex flex-row items-center justify-between p-6 shrink-0">
+               <CardHeader className="border-b border-border bg-white/5 flex flex-row items-center justify-between p-6 shrink-0">
                   <div className="flex items-center gap-4">
-                     <div className="size-10 rounded-xl bg-primary text-black flex items-center justify-center font-black italic text-lg">
+                     <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-black italic text-lg">
                         {selectedChat.userName?.substring(0, 1)}
                      </div>
                      <div>
                         <div className="font-black text-white uppercase italic tracking-tighter text-base leading-none mb-1">{selectedChat.userName}</div>
-                        <div className="text-[10px] text-zinc-600 font-mono font-bold tracking-tight">{selectedChat.userEmail}</div>
+                        <div className="text-[10px] text-slate-400 font-mono font-bold tracking-tight">{selectedChat.userEmail}</div>
                      </div>
                   </div>
                   <Badge className="bg-primary/20 text-primary uppercase text-[8px] tracking-widest border-none px-2 h-6">Live Link</Badge>
                </CardHeader>
-               <CardContent className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar">
+               <CardContent className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar bg-white/5">
                   {messages.map((m, i) => (
                      <div key={i} className={`flex ${m.senderId === 'admin' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] p-4 rounded-2xl text-[13px] ${m.senderId === 'admin' ? 'bg-primary text-black font-black rounded-tr-none' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 rounded-tl-none font-medium'}`}>
+                        <div className={`max-w-[85%] p-4 rounded-2xl text-[13px] ${m.senderId === 'admin' ? 'bg-primary text-primary-foreground font-black rounded-tr-none shadow-sm' : 'bg-background text-slate-300 border border-border rounded-tl-none font-medium shadow-sm'}`}>
                            {m.text}
-                           <div className={`text-[8px] mt-2 opacity-50 font-black ${m.senderId === 'admin' ? 'text-black/60 text-right' : 'text-zinc-500'}`}>
+                           <div className={`text-[8px] mt-2 opacity-50 font-black ${m.senderId === 'admin' ? 'text-primary-foreground/60 text-right' : 'text-slate-400'}`}>
                              {m.createdAt ? format(m.createdAt.toDate(), 'HH:mm') : '...'}
                            </div>
                         </div>
@@ -1336,22 +1336,22 @@ function AdminChatManager() {
                   ))}
                   <div ref={scrollRef} />
                </CardContent>
-               <div className="p-8 border-t border-zinc-900 bg-zinc-950 shrink-0">
+               <div className="p-8 border-t border-border bg-white/5 shrink-0">
                   <form onSubmit={handleSend} className="flex gap-4">
                      <Input 
                         placeholder="Type your reply here..." 
-                        className="bg-[#0c0c0c] border-[#1a1a1a] h-14 text-sm rounded-xl px-6 focus:border-primary font-bold text-white placeholder:text-zinc-800"
+                        className="bg-background border-border h-14 text-sm rounded-xl px-6 focus:border-primary font-bold text-white placeholder:text-slate-200 shadow-sm"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                      />
-                     <Button type="submit" size="icon" className="size-14 rounded-xl bg-primary text-black font-black gold-glow">
+                     <Button type="submit" size="icon" className="size-14 rounded-xl bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20 hover:scale-105 transition-all">
                         <Share2 className="size-6" />
                      </Button>
                   </form>
                </div>
             </>
          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-zinc-800 gap-6">
+            <div className="h-full flex flex-col items-center justify-center text-slate-300 gap-6">
                <MessageSquare className="size-16 opacity-10" />
                <div className="font-black text-[10px] uppercase tracking-[0.4em] italic animate-pulse">Select a chat to reply</div>
             </div>

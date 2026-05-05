@@ -24,7 +24,10 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
   const { user, userData, loading } = useAuth();
   const ADMIN_EMAILS = ['btechtools.ng@gmail.com', 'goldbrickexchange31@gmail.com'];
 
-  if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-black"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary"></div></div>;
+  if (loading) return <div className="h-screen w-screen flex flex-col items-center justify-center bg-background gap-6">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary border-r-2 shadow-[0_0_20px_rgba(var(--primary),0.2)]"></div>
+    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic animate-pulse">Initializing Security Protocol...</div>
+  </div>;
   if (!user) return <Navigate to="/login" />;
   
   const isUserAdmin = userData?.role === 'admin' || (user?.email && ADMIN_EMAILS.includes(user.email));

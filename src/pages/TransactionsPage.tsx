@@ -45,76 +45,82 @@ export default function TransactionsPage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3 text-white">
-             <History className="text-primary" /> Transaction Log
+      <div className="space-y-10 pb-12">
+        <header className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase vibrant-text flex items-center gap-4">
+             <History className="text-primary size-8 md:size-12" /> Transaction Ledger
           </h1>
-          <p className="text-zinc-500">Complete history of your financial activity.</p>
-        </div>
+          <p className="text-white/40 font-bold text-[10px] md:text-xs uppercase tracking-[0.3em]">Complete history of your financial deployments and extractions.</p>
+        </header>
 
-        <Card className="bg-zinc-950 border-zinc-900 overflow-hidden">
-           <CardContent className="p-0 overflow-x-auto">
-              <Table>
-                 <TableHeader className="bg-zinc-900/50">
-                    <TableRow className="border-zinc-900 hover:bg-transparent">
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Type</TableHead>
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Amount</TableHead>
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Currency</TableHead>
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Status</TableHead>
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">Date</TableHead>
-                       <TableHead className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest text-right">Action</TableHead>
-                    </TableRow>
-                 </TableHeader>
-                 <TableBody>
-                    {transactions.length === 0 ? (
-                       <TableRow>
-                          <TableCell colSpan={6} className="h-40 text-center text-zinc-500 border-zinc-900">
-                             No transactions found. Your activity will appear here.
-                          </TableCell>
+        <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-2xl border">
+           <CardContent className="p-0">
+              <div className="overflow-x-auto no-scrollbar">
+                 <Table>
+                    <TableHeader className="bg-white/5 border-b border-border">
+                       <TableRow className="hover:bg-transparent border-none">
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em]">Operation Type</TableHead>
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em]">Volume (USD)</TableHead>
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em]">Asset</TableHead>
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em]">Audit Status</TableHead>
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em]">Timestamp</TableHead>
+                          <TableHead className="px-8 py-6 text-white/40 font-black uppercase text-[10px] tracking-[0.3em] text-right">Reference</TableHead>
                        </TableRow>
-                    ) : (
-                       transactions.map((tx) => (
-                          <TableRow key={tx.id} className="border-zinc-900 hover:bg-zinc-900/30 transition-colors">
-                             <TableCell>
-                                <div className="flex items-center gap-3">
-                                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tx.type === 'deposit' ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'}`}>
-                                      {tx.type === 'deposit' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
-                                   </div>
-                                   <span className="capitalize font-medium text-zinc-300">{tx.type}</span>
-                                </div>
-                             </TableCell>
-                             <TableCell className="font-bold text-white">
-                                ${tx.amount.toLocaleString()}
-                             </TableCell>
-                             <TableCell className="font-mono text-zinc-400">
-                                {tx.currency}
-                             </TableCell>
-                             <TableCell>
-                                <Badge className={getStatusColor(tx.status)}>
-                                   {tx.status}
-                                </Badge>
-                             </TableCell>
-                             <TableCell className="text-zinc-500">
-                                {tx.createdAt ? format(tx.createdAt.toDate(), 'MMM dd, yyyy HH:mm') : 'Refining...'}
-                             </TableCell>
-                             <TableCell className="text-right">
-                                {tx.txHash && (
-                                   <a 
-                                     href={`#`} 
-                                     className="text-primary hover:text-white transition-colors"
-                                     target="_blank"
-                                     rel="noopener noreferrer"
-                                   >
-                                      <ExternalLink size={16} className="inline" />
-                                   </a>
-                                )}
+                    </TableHeader>
+                    <TableBody>
+                       {transactions.length === 0 ? (
+                          <TableRow>
+                             <TableCell colSpan={6} className="h-64 text-center text-white/20 italic font-black uppercase text-xs tracking-[0.5em] border-none">
+                                No records currently stored in the blockchain ledger.
                              </TableCell>
                           </TableRow>
-                       ))
-                    )}
-                 </TableBody>
-              </Table>
+                       ) : (
+                          transactions.map((tx) => (
+                             <TableRow key={tx.id} className="border-border hover:bg-white/5 transition-colors group">
+                                <TableCell className="px-8 py-6">
+                                   <div className="flex items-center gap-4">
+                                      <div className={`size-10 rounded-xl flex items-center justify-center border transition-transform group-hover:scale-110 ${tx.type === 'deposit' || tx.type === 'investment' || tx.type === 'referral_bonus' ? 'bg-primary/5 text-primary border-primary/10 shadow-sm shadow-primary/5' : 'bg-orange-500/10 text-orange-500 border-orange-500/20 shadow-sm shadow-orange-500/5'}`}>
+                                         {tx.type === 'deposit' || tx.type === 'referral_bonus' || tx.type === 'investment' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                                      </div>
+                                      <span className="capitalize font-black text-white italic uppercase tracking-tighter text-sm">{tx.type}</span>
+                                   </div>
+                                </TableCell>
+                                <TableCell className="px-8 py-6 font-black font-mono text-white text-lg tracking-tighter">
+                                   ${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </TableCell>
+                                <TableCell className="px-8 py-6">
+                                   <Badge variant="outline" className="font-mono text-white/40 border-white/5 bg-white/5 px-3 font-bold uppercase text-[10px] tracking-widest h-6">
+                                      {tx.currency || 'USD'}
+                                   </Badge>
+                                </TableCell>
+                                <TableCell className="px-8 py-6">
+                                   <Badge className={`uppercase text-[9px] font-black tracking-widest border-none px-3 h-6 shadow-sm ${getStatusColor(tx.status)}`}>
+                                      {tx.status}
+                                   </Badge>
+                                </TableCell>
+                                <TableCell className="px-8 py-6 text-white/40 font-mono font-bold text-[10px]">
+                                   {tx.createdAt ? format(tx.createdAt.toDate(), 'MMM dd, yyyy HH:mm') : 'INITIALIZING...'}
+                                </TableCell>
+                                <TableCell className="px-8 py-6 text-right">
+                                   {tx.txHash ? (
+                                      <a 
+                                        href={`https://etherscan.io/tx/${tx.txHash}`} 
+                                        className="text-primary hover:text-white transition-colors inline-flex items-center gap-2 font-black text-[9px] uppercase tracking-widest border border-primary/20 hover:border-primary px-3 py-1.5 rounded-lg bg-primary/5"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                      >
+                                         <span className="hidden md:inline">Verify</span> <ExternalLink size={12} className="inline" />
+                                      </a>
+                                   ) : (
+                                     <span className="text-white/20 font-mono text-xs italic">System Record</span>
+                                   )}
+                                </TableCell>
+                             </TableRow>
+                          ))
+                       )}
+                    </TableBody>
+                 </Table>
+              </div>
            </CardContent>
         </Card>
       </div>

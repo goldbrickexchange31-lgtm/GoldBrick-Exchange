@@ -47,7 +47,7 @@ export default function BTCChart() {
   }, []);
 
   return (
-    <div className="w-full bg-[#080808] rounded-3xl border border-zinc-900/50 p-6 shadow-2xl gold-glow overflow-hidden">
+    <div className="w-full bg-[#080808] rounded-3xl border border-zinc-900/50 p-6 shadow-2xl vibrant-glow overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">

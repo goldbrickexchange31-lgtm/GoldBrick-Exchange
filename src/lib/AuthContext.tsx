@@ -10,6 +10,7 @@ interface UserData {
   balance: number;
   totalProfit: number;
   totalInvested: number;
+  referralEarnings: number;
   referralCode: string;
   referredBy?: string | null;
   role: 'user' | 'admin';

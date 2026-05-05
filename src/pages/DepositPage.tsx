@@ -116,130 +116,137 @@ export default function DepositPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto space-y-10 pb-12">
-        <header className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase gold-text leading-tight">Deposit Money</h1>
-          <p className="text-zinc-500 font-mono text-[9px] md:text-[10px] uppercase tracking-widest font-bold">Add money to your account using crypto</p>
+      <div className="max-w-2xl mx-auto space-y-10 pb-12 px-4 sm:px-0">
+        <header className="space-y-3">
+          <h1 className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase vibrant-text leading-tight drop-shadow-sm">Deposit Capital</h1>
+          <p className="text-white/40 font-bold text-[10px] uppercase tracking-[0.3em] font-bold">Deploy your assets into the investment pool</p>
         </header>
 
         {step === 1 && (
-          <Card className="bg-[#080808] border-primary/20 shadow-2xl gold-glow rounded-[2.5rem] overflow-hidden border-t-4 border-t-primary">
-            <CardHeader className="p-8 border-b border-zinc-900 bg-zinc-900/20">
-               <CardTitle className="text-2xl font-black italic uppercase tracking-tighter gold-text">Configure Amount</CardTitle>
-               <CardDescription className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest font-bold mt-1">SELECT YOUR PREFERRED ASSET AND INJECTION VOLUME</CardDescription>
+          <Card className="bg-card border-border shadow-2xl rounded-[2.5rem] overflow-hidden border-t-4 border-t-primary border">
+            <CardHeader className="p-8 border-b border-border bg-white/5">
+               <CardTitle className="text-2xl font-black italic uppercase tracking-tighter text-white flex items-center gap-3">
+                 <Wallet className="size-6 text-primary" /> Setup Amount
+               </CardTitle>
+               <CardDescription className="text-white/40 font-bold text-[10px] uppercase tracking-widest mt-2 px-1">CHOOSE YOUR ASSET AND INVESTMENT VOLUME</CardDescription>
             </CardHeader>
             <CardContent className="space-y-8 p-10">
                <div className="space-y-4">
-                  <Label className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Choose Crypto Currency</Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Label className="text-[10px] text-white/40 font-black uppercase tracking-widest">Select Cryptocurrency</Label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                      {wallets.map(w => (
                        <div 
                          key={w.id} 
                          onClick={() => setSelectedWallet(w)}
-                         className={`p-5 rounded-[1.5rem] border cursor-pointer transition-all flex items-center justify-between group ${selectedWallet?.id === w.id ? 'bg-primary/5 border-primary gold-glow' : 'bg-black border-zinc-900 hover:border-zinc-700'}`}
+                         className={`p-6 rounded-[2rem] border-2 cursor-pointer transition-all flex items-center justify-between group ${selectedWallet?.id === w.id ? 'bg-primary/5 border-primary shadow-lg shadow-primary/10' : 'bg-card border-border hover:border-primary/30'}`}
                        >
                           <div className="flex items-center gap-4">
-                             <div className={`size-12 rounded-2xl flex items-center justify-center font-black italic text-xl transition-all ${selectedWallet?.id === w.id ? 'bg-primary text-black' : 'bg-zinc-900 text-zinc-500'}`}>
+                             <div className={`size-14 rounded-2xl flex items-center justify-center font-black italic text-2xl transition-all ${selectedWallet?.id === w.id ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-white/5 text-white/20 border border-white/5'}`}>
                                 {w.symbol[0]}
                              </div>
                              <div>
-                                <div className={`font-black uppercase tracking-tighter italic ${selectedWallet?.id === w.id ? 'text-primary' : 'text-zinc-400'}`}>{w.currency}</div>
-                                <div className="text-[10px] text-zinc-500 font-mono uppercase font-bold tracking-widest">{w.network}</div>
+                                <div className={`font-black uppercase tracking-tighter italic text-lg ${selectedWallet?.id === w.id ? 'text-primary' : 'text-white/40'}`}>{w.currency}</div>
+                                <div className="text-[10px] text-white/20 font-mono uppercase font-bold tracking-widest">{w.network}</div>
                              </div>
                           </div>
-                          {selectedWallet?.id === w.id && <CheckCircle2 className="text-primary size-6 animate-in zoom-in" />}
+                          {selectedWallet?.id === w.id && <CheckCircle2 className="text-primary size-7 animate-in zoom-in" />}
                        </div>
                      ))}
-                     {wallets.length === 0 && (
-                       <div className="p-8 bg-zinc-950 border border-zinc-900 border-dashed rounded-3xl text-center text-[10px] text-zinc-600 uppercase tracking-widest">
-                         Waiting for wallet availability...
-                       </div>
-                     )}
                   </div>
                </div>
 
-               <div className="space-y-3">
-                  <Label className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Deposit Amount (USD)</Label>
-                  <div className="relative">
-                    <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 size-8 text-primary/30" />
+               <div className="space-y-4">
+                  <Label className="text-[10px] text-white/40 font-black uppercase tracking-widest">Deposit Amount (USD)</Label>
+                  <div className="relative group">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 size-10 bg-white/5 rounded-xl flex items-center justify-center border border-border group-focus-within:border-primary/40 transition-colors">
+                      <DollarSign className="size-6 text-primary" />
+                    </div>
                     <Input 
                       type="number" 
-                      placeholder="500.00" 
-                      className="bg-[#0c0c0c] border-[#1a1a1a] h-16 md:h-20 text-2xl md:text-4xl font-black font-mono text-primary pl-14 md:pl-16 rounded-2xl md:rounded-[1.5rem] placeholder:text-zinc-900"
+                      placeholder="e.g. 5000" 
+                      className="bg-background border-border h-20 md:h-24 text-4xl md:text-5xl font-black font-mono text-white pl-20 md:pl-24 rounded-2xl md:rounded-[2rem] focus:ring-1 focus:ring-primary/20 shadow-inner placeholder:text-white/5"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                     />
                   </div>
-                  <p className="text-[10px] text-zinc-500 italic font-medium px-2">Minimum deposit: $100</p>
+                  <div className="flex items-center gap-2 bg-white/5 p-4 rounded-xl border border-border">
+                     <ShieldCheck className="size-4 text-primary" />
+                     <p className="text-[10px] text-white/40 font-black uppercase tracking-widest italic">Minimum Deposit Requirement: <span className="text-white font-black">$100.00</span></p>
+                  </div>
                </div>
 
                <Button 
                  onClick={() => setStep(2)} 
                  disabled={!amount || parseFloat(amount) < 10 || !selectedWallet} 
-                 className="w-full h-16 bg-primary text-black font-black text-lg uppercase tracking-widest rounded-2xl gold-glow hover:scale-[1.01] transition-all"
+                 className="w-full h-18 bg-primary text-primary-foreground font-black text-xl uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40"
                >
-                 CONTINUE <ArrowRight className="ml-2 size-5" />
+                 NEXT STEP <ArrowRight className="ml-2 size-6" />
                </Button>
             </CardContent>
           </Card>
         )}
 
         {step === 2 && selectedWallet && (
-          <div className="space-y-6">
-            <Card className="bg-[#080808] border-primary/20 shadow-2xl gold-glow rounded-[2.5rem] overflow-hidden border-t-4 border-t-primary">
-               <CardHeader className="text-center p-6 md:p-8 border-b border-zinc-900 bg-zinc-900/20">
-                  <CardTitle className="text-2xl md:text-4xl font-black italic tracking-tighter uppercase gold-text">Finalize Deposit</CardTitle>
-                  <CardDescription className="text-zinc-500 font-mono text-[10px] uppercase tracking-widest font-bold mt-2">TRANSFER {amount} USD EQUIVALENT TO THE ADDRESS BELOW</CardDescription>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5">
+            <Card className="bg-card border-border shadow-2xl rounded-[2.5rem] overflow-hidden border-t-4 border-t-primary border">
+               <CardHeader className="text-center p-8 md:p-10 border-b border-border bg-white/5">
+                  <CardTitle className="text-3xl md:text-5xl font-black italic tracking-tighter uppercase vibrant-text">Final Audit</CardTitle>
+                  <CardDescription className="text-white/40 font-bold text-[10px] uppercase tracking-widest mt-3">TRANSFER {amount} USD EQUIVALENT TO THE ADDRESS BELOW</CardDescription>
                </CardHeader>
-               <CardContent className="flex flex-col items-center p-6 md:p-10 space-y-6 md:space-y-8">
-                  <div className="p-6 bg-white rounded-[2rem] shadow-2xl shadow-white/5 relative group">
+               <CardContent className="flex flex-col items-center p-8 md:p-10 space-y-8 md:space-y-10">
+                  <div className="p-8 bg-background rounded-[3rem] shadow-2xl relative group border-4 border-white/5">
                      {selectedWallet.qrCodeUrl ? (
-                        <img src={selectedWallet.qrCodeUrl} alt="QR Code" className="size-[200px] object-contain" />
+                        <img src={selectedWallet.qrCodeUrl} alt="QR Code" className="size-[240px] object-contain rounded-xl" />
                      ) : (
-                        <QRCodeSVG value={selectedWallet.address} size={200} />
+                        <QRCodeSVG value={selectedWallet.address} size={240} className="rounded-xl" />
                      )}
-                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem] flex items-center justify-center">
-                        <QrCode className="size-16 text-black opacity-20" />
+                     <div className="absolute inset-0 bg-background/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
+                        <QrCode className="size-20 text-primary opacity-40 animate-pulse" />
                      </div>
                   </div>
                   
-                  <div className="w-full space-y-8">
+                  <div className="w-full space-y-10">
                     <div className="space-y-4 text-center">
-                       <Label className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">OFFICIAL {selectedWallet.currency} VAULT ({selectedWallet.network})</Label>
-                       <div className="flex items-center gap-2 bg-[#0c0c0c] border border-zinc-900 p-6 rounded-2xl group relative overflow-hidden">
-                          <div className="absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500" />
-                          <span className="text-sm font-black font-mono break-all text-primary flex-1 z-10">{selectedWallet.address}</span>
-                          <Button size="icon" variant="ghost" onClick={handleCopy} className="size-12 rounded-xl bg-zinc-900 text-primary hover:bg-primary hover:text-black transition-all z-10">
-                            <Copy className="size-5" />
+                       <Label className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">Official {selectedWallet.currency} Repository ({selectedWallet.network})</Label>
+                       <div className="flex items-center gap-3 bg-white/5 border-2 border-border p-6 rounded-[1.5rem] group relative overflow-hidden shadow-inner">
+                          <div className="absolute inset-0 bg-primary opacity-[0.03] translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-700" />
+                          <span className="text-sm md:text-lg font-black font-mono break-all text-white flex-1 z-10 select-all px-2">{selectedWallet.address}</span>
+                          <Button size="icon" variant="ghost" onClick={handleCopy} className="size-14 rounded-2xl bg-background text-primary border border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all z-10 shadow-sm">
+                            <Copy className="size-6" />
                           </Button>
                        </div>
                     </div>
 
-                    <div className="bg-zinc-950/50 p-6 rounded-2xl border border-zinc-900 space-y-3">
-                       <div className="flex items-center gap-3 text-primary">
-                          <ShieldCheck className="size-5" />
-                          <span className="text-[10px] font-black uppercase tracking-widest italic">Command Instructions</span>
+                    <div className="bg-white/5 p-8 rounded-[2rem] border border-border space-y-4 relative overflow-hidden shadow-sm">
+                       <div className="absolute top-0 right-0 p-6 opacity-5 rotate-12">
+                          <ShieldCheck className="size-20" />
                        </div>
-                       <p className="text-[11px] text-zinc-400 font-medium leading-relaxed leading-snug">
-                         {config?.depositInstruction || "Send the exact USD equivalent in crypto to the address provided. Transactions are monitored 24/7."}
+                       <div className="flex items-center gap-3 text-primary relative z-10">
+                          <ShieldCheck className="size-6" />
+                          <span className="text-xs font-black uppercase tracking-widest italic">Security Directives</span>
+                       </div>
+                       <p className="text-[11px] text-white/40 font-bold leading-relaxed uppercase relative z-10">
+                         {config?.depositInstruction || "Transfer the exact amount to the secured vault address above. Our automated auditing system will verify the block confirmation instantly."}
                        </p>
                     </div>
 
-                    <div className="space-y-6 pt-6 border-t border-zinc-900">
-                       <div className="space-y-3">
-                          <Label className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Transaction Signature (TXID)</Label>
+                    <div className="space-y-8 pt-10 border-t border-border">
+                       <div className="space-y-4">
+                          <Label className="text-[10px] text-white/40 font-black uppercase tracking-widest">Digital Signature Hash (TXID)</Label>
                           <div className="relative">
-                            <Wallet className="absolute left-6 top-1/2 -translate-y-1/2 size-5 text-primary/30" />
+                            <div className="absolute left-6 top-1/2 -translate-y-1/2 size-8 bg-white/5 rounded-lg flex items-center justify-center border border-border">
+                              <Wallet className="size-4 text-primary" />
+                            </div>
                             <Input 
                               placeholder="PASTE BLOCKCHAIN HASH HERE" 
-                              className="bg-[#0c0c0c] border-[#1a1a1a] h-14 pl-14 rounded-xl font-mono text-sm uppercase tracking-widest text-zinc-300 placeholder:text-zinc-800"
+                              className="bg-background border-border h-16 pl-16 rounded-2xl font-mono text-sm uppercase tracking-widest text-white placeholder:text-white/5 shadow-sm font-bold"
                               value={txHash}
                               onChange={(e) => setTxHash(e.target.value)}
                             />
                           </div>
                        </div>
-                       <div className="space-y-3">
-                          <Label className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Visual Audit Proof (SCREENSHOT)</Label>
+                       <div className="space-y-4">
+                          <Label className="text-[10px] text-white/40 font-black uppercase tracking-widest">Upload Deposit Evidence (SCREENSHOT)</Label>
                           <div className="relative">
                              <Input 
                                 type="file" 
@@ -250,25 +257,29 @@ export default function DepositPage() {
                              />
                              <Label 
                                 htmlFor="receipt" 
-                                className="flex items-center justify-center gap-4 bg-[#0c0c0c] border border-zinc-900 border-dashed py-12 rounded-[1.5rem] cursor-pointer hover:border-primary transition-all group overflow-hidden relative"
+                                className="flex items-center justify-center gap-4 bg-white/5 border-2 border-border border-dashed py-16 rounded-[2.5rem] cursor-pointer hover:border-primary transition-all group overflow-hidden relative shadow-inner"
                              >
                                 <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 {isUploading ? (
-                                  <div className="flex flex-col items-center gap-3">
-                                    <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Uploading Evidence...</span>
+                                  <div className="flex flex-col items-center gap-4">
+                                    <div className="size-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                                    <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">Uploading Ledger Data...</span>
                                   </div>
                                 ) : receiptUrl ? (
-                                  <div className="flex items-center gap-3 text-green-500 font-black uppercase tracking-widest text-xs scale-110 transition-transform">
-                                    <CheckCircle2 className="size-6" /> 
-                                    <span>Audit Evidence Logged</span>
+                                  <div className="flex flex-col items-center gap-4 text-green-600 font-black uppercase tracking-[0.2em] animate-in zoom-in">
+                                    <div className="size-16 bg-green-500/10 rounded-full flex items-center justify-center border border-green-100 shadow-lg shadow-green-100/50">
+                                       <CheckCircle2 className="size-10" /> 
+                                    </div>
+                                    <span className="text-sm">Audit Evidence Logged</span>
                                   </div>
                                 ) : (
-                                  <div className="flex flex-col items-center gap-4 text-center">
-                                     <Upload className="size-10 text-zinc-700 group-hover:text-primary transition-colors" /> 
-                                     <div className="space-y-1">
-                                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 group-hover:text-white">Upload Receipt Screenshot</span>
-                                       <p className="text-[8px] text-zinc-600 uppercase font-bold tracking-widest">JPG, PNG OR PDF | MAX 5MB</p>
+                                  <div className="flex flex-col items-center gap-6 text-center">
+                                     <div className="size-20 bg-background rounded-3xl flex items-center justify-center border border-border shadow-md group-hover:scale-110 transition-transform">
+                                        <Upload className="size-10 text-white/20 group-hover:text-primary transition-colors" /> 
+                                     </div>
+                                     <div className="space-y-2">
+                                       <span className="text-xs font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white transition-colors">Drop Proof or Click to Select</span>
+                                       <p className="text-[9px] text-white/20 uppercase font-bold tracking-widest">Accepted: PDF, PNG, JPG (MAX 5MB)</p>
                                      </div>
                                   </div>
                                 )}
@@ -278,35 +289,37 @@ export default function DepositPage() {
                     </div>
                   </div>
                   
-                  <Button 
-                    onClick={handleSubmitDeposit} 
-                    disabled={loading || !receiptUrl || !txHash} 
-                    className="w-full h-16 bg-primary text-black font-black text-lg uppercase tracking-widest rounded-2xl gold-glow hover:scale-[1.01] transition-all"
-                  >
-                    {loading ? 'SYNCING WITH LEDGER...' : 'CONFIRM CAPITAL INJECTION'}
-                  </Button>
+                  <div className="w-full flex flex-col gap-6 pt-6">
+                    <Button 
+                      onClick={handleSubmitDeposit} 
+                      disabled={loading || !receiptUrl || !txHash} 
+                      className="w-full h-20 bg-primary text-primary-foreground font-black text-xl uppercase tracking-widest rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.01] transition-all hover:shadow-primary/50"
+                    >
+                      {loading ? 'AUDITING TRANSACTION...' : 'DEPLOY CAPITAL NOW'}
+                    </Button>
+                    <Button variant="ghost" onClick={() => setStep(1)} className="w-full text-white/40 font-black uppercase text-xs tracking-widest hover:text-white transition-colors h-12">Return to Configuration</Button>
+                  </div>
                </CardContent>
             </Card>
-            <Button variant="ghost" onClick={() => setStep(1)} className="w-full text-zinc-500 font-black uppercase text-[10px] tracking-[0.3em] hover:text-white">Cancel Operation</Button>
           </div>
         )}
 
         {step === 3 && (
-          <Card className="bg-[#080808] border-zinc-900 text-center py-20 rounded-[3rem] shadow-2xl gold-glow">
-             <CardContent className="space-y-8">
-                <div className="size-24 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto ring-8 ring-green-500/5">
-                   <CheckCircle2 className="size-12" />
+          <Card className="bg-card border-border text-center py-24 rounded-[3.5rem] shadow-3xl border animate-in zoom-in duration-500">
+             <CardContent className="space-y-10">
+                <div className="size-32 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto ring-[16px] ring-green-500/10 shadow-lg shadow-green-500/10 animate-bounce">
+                   <CheckCircle2 className="size-16" />
                 </div>
-                <div className="space-y-3">
-                  <h2 className="text-4xl font-black italic uppercase tracking-tighter gold-text">Deposit Pending</h2>
-                  <p className="text-zinc-400 font-medium max-w-sm mx-auto leading-relaxed">
-                    Your deposit of <span className="text-white font-bold">${amount}</span> has been received. 
-                    We are verifying your transaction. Your money will show up within 30 minutes.
+                <div className="space-y-4">
+                  <h2 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter vibrant-text leading-tight">Syncing Processed</h2>
+                  <p className="text-white/40 font-bold text-sm max-w-sm mx-auto leading-relaxed uppercase tracking-wide">
+                    Your injection of <span className="text-white font-black underline decoration-primary decoration-4 underline-offset-4">${amount}</span> is scheduled for audit. 
+                    Expect fulfillment within 30-60 minutes.
                   </p>
                 </div>
-                <div className="pt-8 flex flex-col items-center gap-4 max-w-xs mx-auto">
-                   <Button onClick={() => navigate('/transactions')} className="w-full h-14 bg-primary text-black font-black uppercase tracking-widest rounded-xl gold-glow">AUDIT LOGS</Button>
-                   <Button variant="ghost" onClick={() => navigate('/dashboard')} className="w-full uppercase text-[10px] font-black tracking-widest text-zinc-500 hover:text-white">BACK TO CORE</Button>
+                <div className="pt-10 flex flex-col items-center gap-4 max-w-sm mx-auto px-6">
+                   <Button onClick={() => navigate('/transactions')} className="w-full h-16 bg-primary text-primary-foreground font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all text-xs">AUDIT LOGS</Button>
+                   <Button variant="ghost" onClick={() => navigate('/dashboard')} className="w-full uppercase text-xs font-black tracking-[0.2em] text-white/40 hover:text-white">BACK TO CORE</Button>
                 </div>
              </CardContent>
           </Card>

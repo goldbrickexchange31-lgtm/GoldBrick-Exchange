@@ -34,14 +34,15 @@ import {
   Timestamp,
   writeBatch,
   orderBy,
-  limit
+  limit,
+  serverTimestamp
 } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
-  const { userData } = useAuth();
+  const { user, userData } = useAuth();
   const [allInvestments, setAllInvestments] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [globalActivity, setGlobalActivity] = useState<any[]>([]);
@@ -141,6 +142,43 @@ export default function Dashboard() {
     }
   };
 
+  // Handle Auto-Settle Expired Investments
+  useEffect(() => {
+    if (!user || allInvestments.length === 0 || !userData) return;
+
+    const settleExpired = async () => {
+      const expired = allInvestments.filter(inv => inv.status === 'active' && inv.expiresAt && inv.expiresAt.toDate() <= new Date());
+      
+      if (expired.length === 0) return;
+
+      const batch = writeBatch(db);
+      let totalProfitToUser = 0;
+      let totalReturnToUser = 0;
+
+      expired.forEach(inv => {
+        const invRef = doc(db, 'investments', inv.id);
+        batch.update(invRef, { status: 'completed', updatedAt: serverTimestamp() });
+        totalProfitToUser += inv.profit || 0;
+        totalReturnToUser += (inv.amount || 0) + (inv.profit || 0);
+      });
+
+      const userRef = doc(db, 'users', user.uid);
+      batch.update(userRef, {
+        balance: increment(totalReturnToUser),
+        totalProfit: increment(totalProfitToUser)
+      });
+
+      try {
+        await batch.commit();
+        toast.success(`Successfully claimed returns from ${expired.length} matured investment(s)!`);
+      } catch (error) {
+        console.error("Auto-settle error:", error);
+      }
+    };
+
+    settleExpired();
+  }, [allInvestments, user, userData]);
+
   const totalEarnings = React.useMemo(() => {
     const realized = (userData?.totalProfit || 0) + (userData?.referralEarnings || 0);
     const unrealized = allInvestments
@@ -155,14 +193,14 @@ export default function Dashboard() {
         {/* Top Header Section */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
-             <h1 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase gold-text leading-none">Your Dashboard</h1>
-             <p className="text-zinc-500 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold">Welcome Back: {userData?.displayName?.toUpperCase()}</p>
+             <h1 className="text-3xl md:text-4xl font-black italic tracking-tighter uppercase vibrant-text leading-none">Your Dashboard</h1>
+             <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold">Welcome Back: {userData?.displayName?.toUpperCase()}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-             <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-zinc-800 bg-zinc-950 font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-zinc-400 hover:text-white transition-all">
+             <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>
-             <Button onClick={() => navigate('/deposit')} className="flex-1 md:flex-none bg-primary text-black font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-6 md:px-8 rounded-xl gold-glow hover:scale-[1.02] transition-all">
+             <Button onClick={() => navigate('/deposit')} className="flex-1 md:flex-none bg-primary text-primary-foreground font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-6 md:px-8 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">
                <Plus className="size-4 mr-1 md:mr-2" /> Top-Up
              </Button>
           </div>
@@ -170,52 +208,52 @@ export default function Dashboard() {
 
         {/* Primary Stats */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-2xl relative">
+          <Card className="bg-card border-border rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-xl relative">
             <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity rotate-12">
               <Wallet className="size-16" />
             </div>
             <CardHeader className="p-6 pb-2">
-              <CardTitle className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">My Balance</CardTitle>
+              <CardTitle className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">My Balance</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-              <div className="text-3xl md:text-4xl font-black font-mono text-white tracking-tighter italic">${userData?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+              <div className="text-3xl md:text-4xl font-black font-mono text-foreground tracking-tighter italic">${userData?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
               <div className="flex items-center text-[10px] text-primary mt-4 font-black uppercase tracking-widest">
                 <ShieldCheck className="size-3 mr-1" /> Safe & Secure
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-2xl">
+          <Card className="bg-card border-border rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-xl">
             <CardHeader className="p-6 pb-2">
-              <CardTitle className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Total Earnings</CardTitle>
+              <CardTitle className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Total Earnings</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-              <div className="text-3xl md:text-4xl font-black font-mono gold-text tracking-tighter italic">${totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-              <div className="flex items-center text-[10px] text-green-500 mt-4 font-black uppercase tracking-widest">
+              <div className="text-3xl md:text-4xl font-black font-mono vibrant-text tracking-tighter italic">${totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+              <div className="flex items-center text-[10px] text-green-600 mt-4 font-black uppercase tracking-widest">
                 <TrendingUp className="size-3 mr-1" /> Total Profits
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-2xl">
+          <Card className="bg-card border-border rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-xl">
             <CardHeader className="p-6 pb-2">
-              <CardTitle className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">Total Invested</CardTitle>
+              <CardTitle className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Total Invested</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-              <div className="text-3xl md:text-4xl font-black font-mono text-white tracking-tighter italic">${userData?.totalInvested?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-              <div className="flex items-center text-[10px] text-blue-500 mt-4 font-black uppercase tracking-widest">
+              <div className="text-3xl md:text-4xl font-black font-mono text-foreground tracking-tighter italic">${userData?.totalInvested?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+              <div className="flex items-center text-[10px] text-primary mt-4 font-black uppercase tracking-widest">
                 <Activity className="size-3 mr-1" /> Active Investments
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#080808] border-zinc-900 rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-2xl">
+          <Card className="bg-card border-border rounded-[2rem] overflow-hidden group hover:border-primary/30 transition-all shadow-xl">
             <CardHeader className="p-6 pb-2">
-              <CardTitle className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em]">My Plans</CardTitle>
+              <CardTitle className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">My Plans</CardTitle>
             </CardHeader>
             <CardContent className="p-6 pt-0">
-              <div className="text-3xl md:text-4xl font-black font-mono text-white tracking-tighter italic">{activeInvestments.length}</div>
-              <div className="flex items-center text-[10px] text-zinc-400 mt-4 font-black uppercase tracking-widest">
+              <div className="text-3xl md:text-4xl font-black font-mono text-foreground tracking-tighter italic">{activeInvestments.length}</div>
+              <div className="flex items-center text-[10px] text-white/50 mt-4 font-black uppercase tracking-widest">
                 <Zap className="size-3 mr-1" /> Active Now
               </div>
             </CardContent>
@@ -238,14 +276,14 @@ export default function Dashboard() {
 
             <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2 no-scrollbar">
               {activeInvestments.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center border-2 border-zinc-900 border-dashed rounded-[2rem] bg-zinc-950/20 p-8 text-zinc-700 text-center uppercase font-black italic tracking-widest text-[10px]">
-                   <Zap className="size-12 mb-4 opacity-5" />
+                <div className="h-64 flex flex-col items-center justify-center border-2 border-white/5 border-dashed rounded-[2rem] bg-white/5 p-8 text-white/40 text-center uppercase font-black italic tracking-widest text-[10px]">
+                   <Zap className="size-12 mb-4 opacity-10" />
                    <p className="leading-relaxed">You have no active investments</p>
-                   <Button onClick={() => navigate('/invest')} className="mt-8 bg-zinc-900 text-white font-black rounded-xl h-10 px-6 hover:bg-zinc-800 uppercase text-[10px]">Start Now</Button>
+                   <Button onClick={() => navigate('/invest')} className="mt-8 bg-primary text-white font-black rounded-xl h-10 px-6 hover:opacity-90 uppercase text-[10px]">Start Now</Button>
                 </div>
               ) : (
                 activeInvestments.map((inv) => (
-                  <Card key={inv.id} className="bg-[#0c0c0c] border-zinc-900 rounded-3xl overflow-hidden group hover:border-primary/20 transition-all">
+                  <Card key={inv.id} className="bg-card border-border rounded-3xl overflow-hidden group hover:border-primary/20 transition-all shadow-sm">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-6">
                         <div>
@@ -253,18 +291,18 @@ export default function Dashboard() {
                           <div className="text-xl font-black font-mono text-white tracking-tighter italic">${inv.amount?.toLocaleString()}</div>
                         </div>
                         <div className="text-right">
-                          <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Expected</div>
-                          <div className="text-lg font-black text-green-500 font-mono tracking-tighter">+${inv.expectedReturn?.toLocaleString()}</div>
+                          <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Expected</div>
+                          <div className="text-lg font-black text-green-600 font-mono tracking-tighter">+${inv.expectedReturn?.toLocaleString()}</div>
                         </div>
                       </div>
                       <div className="space-y-3">
-                        <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-zinc-500">
+                        <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/40">
                           <span>Investment Progress</span>
                           <span className="text-primary">{formatDistanceToNow(inv.expiresAt.toDate(), { addSuffix: true }).toUpperCase()}</span>
                         </div>
-                        <div className="relative h-2 bg-zinc-900 rounded-full overflow-hidden">
+                        <div className="relative h-2 bg-white/5 rounded-full overflow-hidden">
                            <div 
-                             className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary/50 to-primary transition-all duration-1000 animate-pulse" 
+                             className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary/50 to-primary transition-all duration-1000" 
                              style={{ width: `${calculateProgress(inv.expiresAt, inv.createdAt)}%` }} 
                            />
                         </div>
@@ -289,20 +327,20 @@ export default function Dashboard() {
                         <span className="text-[10px] text-green-500 font-black uppercase tracking-tighter italic">Live</span>
                     </div>
                 </div>
-                <Card className="bg-[#080808] border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-xl">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs text-left">
-                                <thead className="bg-[#0c0c0c] text-zinc-500 text-[10px] uppercase font-black tracking-widest border-b border-zinc-900">
+                                <thead className="bg-white/5 text-white/40 text-[10px] uppercase font-black tracking-widest border-b border-border">
                                     <tr>
                                         <th className="px-6 py-5">User</th>
                                         <th className="px-6 py-5">Amount</th>
                                         <th className="px-6 py-5">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-900/50">
+                                <tbody className="divide-y divide-border">
                                     {globalActivity.map((tx) => (
-                                        <tr key={tx.id} className="hover:bg-zinc-900/20 transition-all group">
+                                        <tr key={tx.id} className="hover:bg-white/5 transition-all group">
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-lg">{tx.country}</span>
@@ -311,10 +349,10 @@ export default function Dashboard() {
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="space-y-0.5">
-                                                    <div className={`font-black font-mono text-sm tracking-tighter ${tx.type === 'Deposit' ? 'text-blue-500' : 'text-orange-500'}`}>
+                                                    <div className={`font-black font-mono text-sm tracking-tighter ${tx.type === 'Deposit' ? 'text-primary' : 'text-orange-500'}`}>
                                                         {tx.type === 'Deposit' ? '+' : '-'}${tx.amount}
                                                     </div>
-                                                    <div className="text-[9px] text-zinc-600 font-black uppercase font-mono">{tx.currency} • {tx.type}</div>
+                                                    <div className="text-[9px] text-white/30 font-black uppercase font-mono">{tx.currency} • {tx.type}</div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
@@ -339,28 +377,28 @@ export default function Dashboard() {
                     </h3>
                     <Button onClick={() => navigate('/transactions')} variant="ghost" size="sm" className="text-[10px] font-black text-primary uppercase tracking-widest hover:bg-primary/10">Full History <ChevronRight className="size-3 ml-1" /></Button>
                 </div>
-                <Card className="bg-[#080808] border-zinc-900 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <Card className="bg-card border-border rounded-[2.5rem] overflow-hidden shadow-xl">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full text-xs text-left">
-                                <thead className="bg-[#0c0c0c] text-zinc-500 text-[10px] uppercase font-black tracking-widest border-b border-zinc-900">
+                                <thead className="bg-white/5 text-white/40 text-[10px] uppercase font-black tracking-widest border-b border-border">
                                     <tr>
                                         <th className="px-6 py-5">Type</th>
                                         <th className="px-6 py-5 text-right">Amount</th>
                                         <th className="px-6 py-5 text-right">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-900/50">
+                                <tbody className="divide-y divide-border">
                                     {recentTransactions.map((tx) => (
-                                        <tr key={tx.id} className="hover:bg-zinc-900/20 transition-all">
+                                        <tr key={tx.id} className="hover:bg-white/5 transition-all">
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`size-8 rounded-lg flex items-center justify-center ${tx.type === 'deposit' ? 'bg-blue-500/10 text-blue-500' : tx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-500' : 'bg-primary/10 text-primary'}`}>
+                                                    <div className={`size-8 rounded-lg flex items-center justify-center ${tx.type === 'deposit' ? 'bg-primary/10 text-primary' : tx.type === 'withdrawal' ? 'bg-orange-500/10 text-orange-500' : 'bg-primary/10 text-primary'}`}>
                                                         {tx.type === 'deposit' ? <ArrowUpRight className="size-4 rotate-180" /> : tx.type === 'withdrawal' ? <ArrowUpRight className="size-4" /> : <RefreshCcw className="size-4" />}
                                                     </div>
                                                     <div>
                                                         <div className="font-black text-white uppercase italic tracking-tighter leading-none mb-1">{tx.type}</div>
-                                                        <div className="text-[9px] text-zinc-600 font-mono font-bold">{tx.createdAt ? formatDistanceToNow(tx.createdAt.toDate(), { addSuffix: true }).toUpperCase() : 'PENDING'}</div>
+                                                        <div className="text-[9px] text-white/30 font-mono font-bold">{tx.createdAt ? formatDistanceToNow(tx.createdAt.toDate(), { addSuffix: true }).toUpperCase() : 'PENDING'}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -376,7 +414,7 @@ export default function Dashboard() {
                                     ))}
                                     {recentTransactions.length === 0 && (
                                         <tr>
-                                            <td colSpan={3} className="px-6 py-20 text-center text-[10px] text-zinc-700 italic font-black uppercase tracking-[0.3em]">No history found</td>
+                                            <td colSpan={3} className="px-6 py-20 text-center text-[10px] text-white/20 italic font-black uppercase tracking-[0.3em]">No history found</td>
                                         </tr>
                                     )}
                                 </tbody>
