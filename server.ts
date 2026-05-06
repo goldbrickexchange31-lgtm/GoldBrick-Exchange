@@ -1,5 +1,4 @@
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { v2 as cloudinary } from 'cloudinary';
@@ -20,25 +19,41 @@ const firebaseConfig = {
   databaseId: "ai-studio-ea749be8-2f23-4412-94ab-7c5b04dff757", // Use the custom database ID
 };
 
-// Initialize Admin SDK
-const firebaseApp = admin.apps.length ? admin.app() : admin.initializeApp({
-  projectId: firebaseConfig.projectId,
-});
+// Initialize Admin SDK safely for serverless
+let firebaseApp: admin.app.App | null = null;
+let db: admin.firestore.Firestore | null = null;
 
-const db = admin.firestore(firebaseApp);
-if (firebaseConfig.databaseId) {
-  // For different database IDs, ensure we are targeting correctly
-  // @ts-ignore
-  db.settings({
-    databaseId: firebaseConfig.databaseId,
-    ignoreUndefinedProperties: true
-  });
+function getDb() {
+  if (db) return db;
+  
+  try {
+    if (!admin.apps.length) {
+      firebaseApp = admin.initializeApp({
+        projectId: firebaseConfig.projectId,
+      });
+    } else {
+      firebaseApp = admin.app();
+    }
+
+    db = admin.firestore(firebaseApp);
+    if (firebaseConfig.databaseId) {
+      db.settings({
+        databaseId: firebaseConfig.databaseId,
+        ignoreUndefinedProperties: true
+      });
+    }
+    return db;
+  } catch (error) {
+    console.error('[FIREBASE] Admin initialization failed:', error);
+    throw error;
+  }
 }
 
 // Background Task: Mature Investments
 async function matureInvestments() {
   try {
-    const invRef = db.collection('investments');
+    const firestore = getDb();
+    const invRef = firestore.collection('investments');
     const snap = await invRef.where('status', '==', 'active').get();
 
     for (const invDoc of snap.docs) {
@@ -105,14 +120,14 @@ async function matureInvestments() {
         const totalPayout = inv.expectedReturn || (amount + profit);
         
         // 3. Update user balance
-        const userRef = db.collection('users').doc(inv.userId);
+        const userRef = firestore.collection('users').doc(inv.userId);
         await userRef.update({
           balance: admin.firestore.FieldValue.increment(totalPayout),
           totalProfit: admin.firestore.FieldValue.increment(profit)
         });
 
         // 4. Record transaction for the layout
-        await db.collection('transactions').add({
+        await firestore.collection('transactions').add({
           userId: inv.userId,
           userName: inv.userName || 'Investor',
           userEmail: inv.userEmail || '',
@@ -131,25 +146,23 @@ async function matureInvestments() {
   }
 }
 
-// Run maturity check every 1 minute
-// Removed top-level calls, moved inside startServer() to ensure initialization order
-
 // Configure Cloudinary
 const CLOUDINARY_DEFAULT_NAME = 'dvx1hj8ax';
 const CLOUDINARY_DEFAULT_KEY = '961765732187325';
 const CLOUDINARY_DEFAULT_SECRET = 'Sya6x-2J0HM7-fDNW57f1CX97VA';
 
-cloudinary.config({
-  cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME || CLOUDINARY_DEFAULT_NAME,
-  api_key: process.env.VITE_CLOUDINARY_API_KEY || CLOUDINARY_DEFAULT_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET || CLOUDINARY_DEFAULT_SECRET
-});
-
-console.log('[CLOUDINARY] Config initialized with cloud_name:', cloudinary.config().cloud_name);
-
 const expressApp = express();
 
 async function configureApp() {
+  // Fresh Cloudinary config
+  cloudinary.config({
+    cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME || CLOUDINARY_DEFAULT_NAME,
+    api_key: process.env.VITE_CLOUDINARY_API_KEY || CLOUDINARY_DEFAULT_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET || CLOUDINARY_DEFAULT_SECRET
+  });
+
+  console.log('[CLOUDINARY] Config initialized in configureApp');
+
   expressApp.use(express.json());
 
   // Logging Middleware
@@ -199,6 +212,8 @@ async function configureApp() {
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    console.log('[SYSTEM] Initializing Vite middleware...');
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',

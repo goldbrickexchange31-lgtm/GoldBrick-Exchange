@@ -191,7 +191,7 @@ export default function DepositPage() {
                <Button 
                  onClick={() => setStep(2)} 
                  disabled={!amount || parseFloat(amount) < 10 || !selectedWallet} 
-                 className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-xs md:text-base uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40 flex items-center justify-center gap-2"
+                 className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-[10px] md:text-base uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40 flex items-center justify-center gap-2"
                >
                  NEXT STEP <ArrowRight className="size-4 md:size-5" />
                </Button>
@@ -306,7 +306,7 @@ export default function DepositPage() {
                     <Button 
                       onClick={handleSubmitDeposit} 
                       disabled={loading || !receiptUrl || !txHash} 
-                      className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-xs md:text-base uppercase tracking-widest rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.01] transition-all hover:shadow-primary/50 flex items-center justify-center"
+                      className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-[10px] md:text-base uppercase tracking-widest rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.01] transition-all hover:shadow-primary/50 flex items-center justify-center"
                     >
                       {loading ? 'AUDITING TRANSACTION...' : 'DEPLOY CAPITAL NOW'}
                     </Button>

@@ -172,7 +172,7 @@ export default function WithdrawPage() {
                 </div>
 
                 <Button 
-                  className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-xs md:text-base uppercase tracking-widest rounded-[1.5rem] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center"
+                  className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-[10px] md:text-base uppercase tracking-widest rounded-[1.5rem] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/30 flex items-center justify-center"
                   onClick={handleWithdraw}
                   disabled={loading || !amount || !wallet}
                 >
