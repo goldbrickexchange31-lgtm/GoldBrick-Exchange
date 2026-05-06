@@ -147,10 +147,9 @@ cloudinary.config({
 
 console.log('[CLOUDINARY] Config initialized with cloud_name:', cloudinary.config().cloud_name);
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
 
+async function configureApp() {
   app.use(express.json());
 
   // Logging Middleware
@@ -206,8 +205,11 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
+    // Production: Serve static files
+    // Use absolute path relative to the process root
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+    
     // Important: Handle API routes BEFORE the wildcard catch-all
     app.get('*', (req, res) => {
       // Avoid sending index.html for API routes that 404
@@ -218,16 +220,26 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    
-    // Start background tasks after server is up
-    console.log('[SYSTEM] Starting maturity checker...');
-    matureInvestments();
-    setInterval(matureInvestments, 60000);
+  return app;
+}
+
+// Start server for traditional environments
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  configureApp().then(() => {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+      
+      // Start background tasks
+      console.log('[SYSTEM] Starting maturity checker...');
+      matureInvestments();
+      setInterval(matureInvestments, 60000);
+    });
+  }).catch(err => {
+    console.error('[SYSTEM] Failed to start server:', err);
   });
 }
 
-startServer().catch(err => {
-  console.error('[SYSTEM] Failed to start server:', err);
-});
+// Export for serverless
+export default app;
+export { configureApp };
