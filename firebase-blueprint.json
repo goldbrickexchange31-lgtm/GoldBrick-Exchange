@@ -27,9 +27,20 @@
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
         "planId": { "type": "string" },
+        "planName": { "type": "string" },
         "amount": { "type": "number" },
+        "minDeposit": { "type": "number" },
+        "profit": { "type": "number" },
+        "profitValue": { "type": "number" },
+        "profitType": { "type": "string" },
+        "expectedReturn": { "type": "number" },
         "status": { "type": "string", "enum": ["active", "completed"] },
+        "durationDays": { "type": "number" },
+        "durationHours": { "type": "number" },
+        "expiresAt": { "type": "string", "format": "date-time" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "amount", "status", "createdAt"]
@@ -42,11 +53,13 @@
         "userId": { "type": "string" },
         "userName": { "type": "string" },
         "userEmail": { "type": "string" },
-        "type": { "type": "string", "enum": ["deposit", "withdrawal"] },
+        "type": { "type": "string", "enum": ["deposit", "withdrawal", "investment", "referral_bonus"] },
         "amount": { "type": "number" },
         "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "description": { "type": "string" },
         "receiptUrl": { "type": "string" },
         "walletAddress": { "type": "string" },
+        "txHash": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "type", "amount", "status", "createdAt"]

@@ -142,7 +142,8 @@ export default function Dashboard() {
     }
   };
 
-  // Handle Auto-Settle Expired Investments
+  // Handle Auto-Settle Expired Investments - REMOVED: Handled by server-side cron to prevent blinking
+  /*
   useEffect(() => {
     if (!user || allInvestments.length === 0 || !userData) return;
 
@@ -178,6 +179,7 @@ export default function Dashboard() {
 
     settleExpired();
   }, [allInvestments, user, userData]);
+  */
 
   const totalEarnings = React.useMemo(() => {
     const realized = (userData?.totalProfit || 0) + (userData?.referralEarnings || 0);

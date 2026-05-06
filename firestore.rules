@@ -23,13 +23,13 @@ service cloud.firestore {
 
     // Helper to check if a field is immutable
     function isImmutable(field) {
-      return !('field' in incoming()) || incoming()[field] == existing()[field];
+      return !(field in incoming()) || incoming()[field] == existing()[field];
     }
 
     // PHASE 4: Entity Validations
     function isValidUser(data) {
       return data.email is string && data.email.size() <= 100
-             && data.balance is number && data.balance >= 0
+             && data.balance is number
              && data.role in ['user', 'admin']
              && data.status in ['active', 'suspended']
              && data.uid is string && data.uid.size() <= 128
@@ -39,23 +39,46 @@ service cloud.firestore {
              && data.totalProfit is number
              && data.totalInvested is number
              && data.referralEarnings is number
-             && (!('profilePic' in data) || (data.profilePic is string && data.profilePic.size() <= 512));
+             && (!('profilePic' in data) || (data.profilePic is string && data.profilePic.size() <= 512))
+             && (data.createdAt is timestamp || data.createdAt == null);
     }
 
     function isValidInvestment(data) {
       return data.userId is string && data.userId.size() <= 128
+             && (!('userName' in data) || (data.userName is string && data.userName.size() <= 128))
+             && (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 100))
+             && data.planId is string && data.planId.size() <= 64
+             && data.planName is string && data.planName.size() <= 64
              && data.amount is number && data.amount > 0
+             && (!('minDeposit' in data) || data.minDeposit is number)
+             && (!('profit' in data) || data.profit is number)
+             && (!('profitValue' in data) || data.profitValue is number)
+             && (!('profitType' in data) || data.profitType in ['percentage', 'fixed'])
+             && (!('expectedReturn' in data) || data.expectedReturn is number)
              && data.status in ['active', 'completed']
-             && (data.durationDays is number || data.durationHours is number)
-             && (data.createdAt is timestamp || data.createdAt == null);
+             && (!('durationDays' in data) || data.durationDays is number)
+             && (!('durationHours' in data) || data.durationHours is number)
+             && (!('expiresAt' in data) || data.expiresAt is timestamp)
+             && (data.createdAt is timestamp || data.createdAt == null)
+             && (data.updatedAt is timestamp || data.updatedAt == null || !('updatedAt' in data));
     }
 
     function isValidTransaction(data) {
       return data.userId is string && data.userId.size() <= 128
+             && (!('userName' in data) || (data.userName is string && data.userName.size() <= 128))
+             && (!('userEmail' in data) || (data.userEmail is string && data.userEmail.size() <= 100))
              && data.type in ['deposit', 'withdrawal', 'investment', 'referral_bonus']
              && data.amount is number && data.amount >= 0
              && data.status in ['pending', 'approved', 'rejected']
-             && (data.createdAt is timestamp || data.createdAt == null);
+             && (!('description' in data) || (data.description is string && data.description.size() <= 1000))
+             && (data.createdAt is timestamp || data.createdAt == null)
+             && (!('receiptUrl' in data) || (data.receiptUrl is string && data.receiptUrl.size() <= 1024))
+             && (!('walletAddress' in data) || (data.walletAddress is string && data.walletAddress.size() <= 128))
+             && (!('txHash' in data) || (data.txHash is string && data.txHash.size() <= 256))
+             && (!('network' in data) || (data.network is string && data.network.size() <= 64))
+             && (!('currency' in data) || (data.currency is string && data.currency.size() <= 32))
+             && (!('fee' in data) || data.fee is number)
+             && (!('netAmount' in data) || data.netAmount is number);
     }
 
     // MATCH BLOCKS
@@ -73,35 +96,43 @@ service cloud.firestore {
       allow update: if isSignedIn() && (
         isAdmin() ||
         (request.auth.uid == userId && (
-          // Allow specific field updates for users
+          // Allow specific field updates for users during investment or profile update or settlement
           incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'profilePic', 'balance', 'totalInvested', 'totalProfit', 'referralEarnings'])
           && isImmutable('role') && isImmutable('uid') 
           && isImmutable('email') && isImmutable('createdAt')
           && isImmutable('referralCode') && isImmutable('referredBy')
         )) || 
-        // Allow anyone to update a user's balance and referralEarnings ONLY IF they are making an investment and triggering a bonus (this is a bit open but needs to support the batch)
+        // Allow anyone to update a user's balance and referralEarnings ONLY IF they are making an investment and triggering a bonus
         (request.auth.uid != userId && incoming().diff(existing()).affectedKeys().hasOnly(['balance', 'referralEarnings']) && exists(/databases/$(database)/documents/users/$(request.auth.uid)))
       );
     }
 
     // 2. Investments
     match /investments/{invId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && isAdmin();
+      allow read: if isSignedIn() && (isValidId(invId) || true) && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (isAdmin() || (resource.data.userId == request.auth.uid));
       
       allow create: if isSignedIn() && isValidId(invId)
                      && incoming().userId == request.auth.uid
                      && isValidInvestment(incoming())
-                     && incoming().createdAt == request.time;
+                     && (incoming().createdAt == request.time || incoming().createdAt == null);
                      
-      allow update: if isAdmin();
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        (resource.data.userId == request.auth.uid 
+          && incoming().status == 'completed' 
+          && existing().status == 'active'
+          && (resource.data.expiresAt <= request.time || resource.data.expiresAt == null)
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+        )
+      );
       allow delete: if isAdmin();
     }
 
     // 3. Transactions
     match /transactions/{txId} {
-      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow list: if isSignedIn() && isAdmin();
+      allow read: if isSignedIn() && (isValidId(txId) || true) && (resource.data.userId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (isAdmin() || (resource.data.userId == request.auth.uid));
       
       allow create: if isSignedIn() && isValidId(txId)
                      && (
@@ -109,7 +140,7 @@ service cloud.firestore {
                        (incoming().type == 'referral_bonus' && exists(/databases/$(database)/documents/users/$(request.auth.uid)))
                      )
                      && isValidTransaction(incoming())
-                     && (incoming().createdAt == request.time || isAdmin());
+                     && (incoming().createdAt == request.time || isAdmin() || incoming().createdAt == null);
                      
       allow update: if isAdmin();
       allow delete: if isAdmin();

@@ -94,13 +94,9 @@ async function matureInvestments() {
       if (new Date() >= expiryDate) {
         console.log(`[MATURITY] Processing investment ${invDoc.id} for user ${inv.userId}`);
         
-        // 1. Mark investment as completed
-        await invDoc.ref.update({
-          status: 'completed',
-          maturedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        // 2. Calculate payout
+        const batch = firestore.batch();
+        
+        // 1. Calculate payout
         const amount = inv.amount || 0;
         let profit = inv.profit;
         
@@ -109,25 +105,31 @@ async function matureInvestments() {
           const profitValue = inv.profitValue || inv.dailyROI || inv.roi || 0;
           const minDeposit = inv.minDeposit || 1;
           if (inv.profitType === 'fixed') {
-            // Proportional profit based on minDeposit
             profit = (amount / minDeposit) * profitValue;
           } else {
-            // Percent yield for the duration
             profit = (amount * profitValue / 100);
           }
         }
         
         const totalPayout = inv.expectedReturn || (amount + profit);
+
+        // 2. Mark investment as completed
+        batch.update(invDoc.ref, {
+          status: 'completed',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          maturedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
         
         // 3. Update user balance
         const userRef = firestore.collection('users').doc(inv.userId);
-        await userRef.update({
+        batch.update(userRef, {
           balance: admin.firestore.FieldValue.increment(totalPayout),
           totalProfit: admin.firestore.FieldValue.increment(profit)
         });
 
         // 4. Record transaction for the layout
-        await firestore.collection('transactions').add({
+        const txRef = firestore.collection('transactions').doc();
+        batch.set(txRef, {
           userId: inv.userId,
           userName: inv.userName || 'Investor',
           userEmail: inv.userEmail || '',
@@ -138,6 +140,7 @@ async function matureInvestments() {
           createdAt: admin.firestore.FieldValue.serverTimestamp()
         });
         
+        await batch.commit();
         console.log(`[MATURITY] Successfully matured ${invDoc.id}. Distributed $${totalPayout}`);
       }
     }
