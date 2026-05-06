@@ -21,11 +21,11 @@ const firebaseConfig = {
 };
 
 // Initialize Admin SDK
-const app = admin.initializeApp({
+const firebaseApp = admin.apps.length ? admin.app() : admin.initializeApp({
   projectId: firebaseConfig.projectId,
 });
 
-const db = admin.firestore(app);
+const db = admin.firestore(firebaseApp);
 if (firebaseConfig.databaseId) {
   // For different database IDs, ensure we are targeting correctly
   // @ts-ignore
@@ -147,13 +147,13 @@ cloudinary.config({
 
 console.log('[CLOUDINARY] Config initialized with cloud_name:', cloudinary.config().cloud_name);
 
-const app = express();
+const expressApp = express();
 
 async function configureApp() {
-  app.use(express.json());
+  expressApp.use(express.json());
 
   // Logging Middleware
-  app.use((req, res, next) => {
+  expressApp.use((req, res, next) => {
     if (req.path.startsWith('/api')) {
       console.log(`[API] ${req.method} ${req.path}`);
     }
@@ -161,12 +161,12 @@ async function configureApp() {
   });
 
   // API Routes
-  app.get('/api/health', (req, res) => {
+  expressApp.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
   // Cloudinary Signed Upload Signature (Secure)
-  app.post('/api/upload/signature', (req, res) => {
+  expressApp.post('/api/upload/signature', (req, res) => {
     console.log('[CLOUDINARY] Signature request received');
     try {
       const config = cloudinary.config();
@@ -198,20 +198,19 @@ async function configureApp() {
   });
 
   // Vite middleware for development
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
-    app.use(vite.middlewares);
+    expressApp.use(vite.middlewares);
   } else {
     // Production: Serve static files
-    // Use absolute path relative to the process root
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    expressApp.use(express.static(distPath));
     
     // Important: Handle API routes BEFORE the wildcard catch-all
-    app.get('*', (req, res) => {
+    expressApp.get('*', (req, res) => {
       // Avoid sending index.html for API routes that 404
       if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'API route not found' });
@@ -220,14 +219,14 @@ async function configureApp() {
     });
   }
 
-  return app;
+  return expressApp;
 }
 
 // Start server for traditional environments
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
   configureApp().then(() => {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, '0.0.0.0', () => {
+    const PORT = parseInt(process.env.PORT || '3000', 10);
+    expressApp.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on http://localhost:${PORT}`);
       
       // Start background tasks
@@ -241,5 +240,5 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
 }
 
 // Export for serverless
-export default app;
+export default expressApp;
 export { configureApp };
