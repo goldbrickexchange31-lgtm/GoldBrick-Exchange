@@ -142,6 +142,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET || 'Sya6x-2J0HM7-fDNW57f1CX97VA'
 });
 
+console.log('[CLOUDINARY] Config initialized with cloud_name:', cloudinary.config().cloud_name);
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
@@ -155,17 +157,31 @@ async function startServer() {
 
   // Cloudinary Signed Upload Signature (Secure)
   app.post('/api/upload/signature', (req, res) => {
-    const timestamp = Math.round(new Date().getTime() / 1000);
-    const signature = cloudinary.utils.api_sign_request(
-      { timestamp, upload_preset: 'Goldbrick' },
-      cloudinary.config().api_secret as string
-    );
-    res.json({ 
-      timestamp, 
-      signature, 
-      cloud_name: cloudinary.config().cloud_name, 
-      api_key: cloudinary.config().api_key 
-    });
+    try {
+      const config = cloudinary.config();
+      if (!config.api_secret) {
+        console.error('[CLOUDINARY] Missing API Secret');
+        return res.status(500).json({ error: 'Server configuration error: missing secret' });
+      }
+
+      const timestamp = Math.round(new Date().getTime() / 1000);
+      const signature = cloudinary.utils.api_sign_request(
+        { timestamp, upload_preset: 'Goldbrick' },
+        config.api_secret as string
+      );
+
+      console.log('[CLOUDINARY] Signature generated successfully for timestamp:', timestamp);
+      
+      res.json({ 
+        timestamp, 
+        signature, 
+        cloud_name: config.cloud_name, 
+        api_key: config.api_key 
+      });
+    } catch (error) {
+      console.error('[CLOUDINARY] Error generating signature:', error);
+      res.status(500).json({ error: 'Internal server error during signature generation' });
+    }
   });
 
   // Vite middleware for development

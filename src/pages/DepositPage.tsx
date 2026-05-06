@@ -188,7 +188,7 @@ export default function DepositPage() {
                <Button 
                  onClick={() => setStep(2)} 
                  disabled={!amount || parseFloat(amount) < 10 || !selectedWallet} 
-                 className="w-full h-16 md:h-18 bg-primary text-primary-foreground font-black text-lg uppercase tracking-[0.1em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40"
+                 className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-sm md:text-lg uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40"
                >
                  NEXT STEP <ArrowRight className="ml-2 size-6" />
                </Button>

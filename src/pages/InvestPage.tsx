@@ -293,7 +293,7 @@ export default function InvestPage() {
                 <Button 
                   onClick={handleInvest} 
                   disabled={loading || !amount || parseFloat(amount) <= 0}
-                  className="w-full h-20 bg-primary text-primary-foreground font-black text-xl uppercase tracking-[0.4em] rounded-[1.5rem] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/30"
+                  className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-sm md:text-lg uppercase tracking-[0.2em] rounded-[1.5rem] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/30"
                 >
                   {loading ? 'DEPLOYING ASSETS...' : 'ENGAGE MINING CYCLE'}
                 </Button>
