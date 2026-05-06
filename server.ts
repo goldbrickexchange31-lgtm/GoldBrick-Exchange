@@ -137,9 +137,9 @@ setInterval(matureInvestments, 60000);
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: 'dvx1hj8ax',
-  api_key: '961765732187325',
-  api_secret: 'Sya6x-2J0HM7-fDNW57f1CX97VA'
+  cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME || 'dvx1hj8ax',
+  api_key: process.env.VITE_CLOUDINARY_API_KEY || '961765732187325',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'Sya6x-2J0HM7-fDNW57f1CX97VA'
 });
 
 async function startServer() {
@@ -158,9 +158,14 @@ async function startServer() {
     const timestamp = Math.round(new Date().getTime() / 1000);
     const signature = cloudinary.utils.api_sign_request(
       { timestamp, upload_preset: 'Goldbrick' },
-      process.env.CLOUDINARY_API_SECRET || 'Sya6x-2J0HM7-fDNW57f1CX97VA'
+      cloudinary.config().api_secret as string
     );
-    res.json({ timestamp, signature, cloud_name: 'dvx1hj8ax', api_key: '961765732187325' });
+    res.json({ 
+      timestamp, 
+      signature, 
+      cloud_name: cloudinary.config().cloud_name, 
+      api_key: cloudinary.config().api_key 
+    });
   });
 
   // Vite middleware for development

@@ -59,6 +59,10 @@ export default function DepositPage() {
     try {
       // Get signed signature from our express backend
       const res = await fetch('/api/upload/signature', { method: 'POST' });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Signature fetch failed: ${errorText}`);
+      }
       const { timestamp, signature, cloud_name, api_key } = await res.json();
 
       const formData = new FormData();
@@ -72,12 +76,18 @@ export default function DepositPage() {
         method: 'POST',
         body: formData
       });
+      
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.error?.message || 'Cloudinary upload failed');
+      }
+
       const data = await uploadRes.json();
       setReceiptUrl(data.secure_url);
       toast.success('Proof of payment received');
-    } catch (error) {
-      toast.error('Upload sequence interrupted. Try again.');
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.message || 'Upload sequence interrupted. Try again.');
+      console.error('Upload Error:', error);
     } finally {
       setIsUploading(false);
     }
@@ -178,7 +188,7 @@ export default function DepositPage() {
                <Button 
                  onClick={() => setStep(2)} 
                  disabled={!amount || parseFloat(amount) < 10 || !selectedWallet} 
-                 className="w-full h-18 bg-primary text-primary-foreground font-black text-xl uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40"
+                 className="w-full h-16 md:h-18 bg-primary text-primary-foreground font-black text-lg uppercase tracking-[0.1em] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all hover:shadow-primary/40"
                >
                  NEXT STEP <ArrowRight className="ml-2 size-6" />
                </Button>
@@ -293,7 +303,7 @@ export default function DepositPage() {
                     <Button 
                       onClick={handleSubmitDeposit} 
                       disabled={loading || !receiptUrl || !txHash} 
-                      className="w-full h-20 bg-primary text-primary-foreground font-black text-xl uppercase tracking-widest rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.01] transition-all hover:shadow-primary/50"
+                      className="w-full h-16 md:h-20 bg-primary text-primary-foreground font-black text-sm md:text-lg uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.01] transition-all hover:shadow-primary/50"
                     >
                       {loading ? 'AUDITING TRANSACTION...' : 'DEPLOY CAPITAL NOW'}
                     </Button>
