@@ -132,14 +132,17 @@ async function matureInvestments() {
 }
 
 // Run maturity check every 1 minute
-matureInvestments(); // Run once on startup
-setInterval(matureInvestments, 60000);
+// Removed top-level calls, moved inside startServer() to ensure initialization order
 
 // Configure Cloudinary
+const CLOUDINARY_DEFAULT_NAME = 'dvx1hj8ax';
+const CLOUDINARY_DEFAULT_KEY = '961765732187325';
+const CLOUDINARY_DEFAULT_SECRET = 'Sya6x-2J0HM7-fDNW57f1CX97VA';
+
 cloudinary.config({
-  cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME || 'dvx1hj8ax',
-  api_key: process.env.VITE_CLOUDINARY_API_KEY || '961765732187325',
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'Sya6x-2J0HM7-fDNW57f1CX97VA'
+  cloud_name: process.env.VITE_CLOUDINARY_CLOUD_NAME || CLOUDINARY_DEFAULT_NAME,
+  api_key: process.env.VITE_CLOUDINARY_API_KEY || CLOUDINARY_DEFAULT_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET || CLOUDINARY_DEFAULT_SECRET
 });
 
 console.log('[CLOUDINARY] Config initialized with cloud_name:', cloudinary.config().cloud_name);
@@ -150,24 +153,35 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Logging Middleware
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      console.log(`[API] ${req.method} ${req.path}`);
+    }
+    next();
+  });
+
   // API Routes
   app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok' });
+    res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
   // Cloudinary Signed Upload Signature (Secure)
   app.post('/api/upload/signature', (req, res) => {
+    console.log('[CLOUDINARY] Signature request received');
     try {
       const config = cloudinary.config();
-      if (!config.api_secret) {
-        console.error('[CLOUDINARY] Missing API Secret');
+      const secret = config.api_secret || CLOUDINARY_DEFAULT_SECRET;
+
+      if (!secret) {
+        console.error('[CLOUDINARY] Missing API Secret in config and fallback');
         return res.status(500).json({ error: 'Server configuration error: missing secret' });
       }
 
       const timestamp = Math.round(new Date().getTime() / 1000);
       const signature = cloudinary.utils.api_sign_request(
         { timestamp, upload_preset: 'Goldbrick' },
-        config.api_secret as string
+        secret
       );
 
       console.log('[CLOUDINARY] Signature generated successfully for timestamp:', timestamp);
@@ -175,8 +189,8 @@ async function startServer() {
       res.json({ 
         timestamp, 
         signature, 
-        cloud_name: config.cloud_name, 
-        api_key: config.api_key 
+        cloud_name: config.cloud_name || CLOUDINARY_DEFAULT_NAME, 
+        api_key: config.api_key || CLOUDINARY_DEFAULT_KEY 
       });
     } catch (error) {
       console.error('[CLOUDINARY] Error generating signature:', error);
@@ -194,14 +208,26 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+    // Important: Handle API routes BEFORE the wildcard catch-all
     app.get('*', (req, res) => {
+      // Avoid sending index.html for API routes that 404
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    
+    // Start background tasks after server is up
+    console.log('[SYSTEM] Starting maturity checker...');
+    matureInvestments();
+    setInterval(matureInvestments, 60000);
   });
 }
 
-startServer();
+startServer().catch(err => {
+  console.error('[SYSTEM] Failed to start server:', err);
+});
