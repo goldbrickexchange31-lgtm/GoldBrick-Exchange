@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const snap = await getDoc(userDocRef);
           if (!snap.exists()) {
-            const adminEmails = ['btechtools.ng@gmail.com', 'goldbrickexchange31@gmail.com'];
+            const adminEmails = ['goldbrickexchange31@gmail.com'];
             const myReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             await setDoc(userDocRef, {
               uid: u.uid,

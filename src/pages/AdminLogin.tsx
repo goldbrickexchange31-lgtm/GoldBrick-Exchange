@@ -9,7 +9,7 @@ import { ShieldAlert } from 'lucide-react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
-const ADMIN_EMAILS = ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'];
+const ADMIN_EMAILS = ['goldbrickexchange31@gmail.com'];
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');

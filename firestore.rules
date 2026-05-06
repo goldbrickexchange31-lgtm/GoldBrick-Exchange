@@ -16,7 +16,7 @@ service cloud.firestore {
     
     function isAdmin() { 
       return isSignedIn() && (
-        request.auth.token.email in ['btechtools.ng@gmail.com', 'goldbrickexchange31@gmail.com'] ||
+        request.auth.token.email in ['goldbrickexchange31@gmail.com'] ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       );
     }
@@ -85,8 +85,7 @@ service cloud.firestore {
     
     // 1. Users
     match /users/{userId} {
-      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
-      allow list: if isSignedIn() && isAdmin();
+      allow get, list: if isSignedIn();
       
       allow create: if isSignedIn() && isValidId(userId) && userId == request.auth.uid
                      && isValidUser(incoming())
@@ -102,8 +101,8 @@ service cloud.firestore {
           && isImmutable('email') && isImmutable('createdAt')
           && isImmutable('referralCode') && isImmutable('referredBy')
         )) || 
-        // Allow anyone to update a user's balance and referralEarnings ONLY IF they are making an investment and triggering a bonus
-        (request.auth.uid != userId && incoming().diff(existing()).affectedKeys().hasOnly(['balance', 'referralEarnings']) && exists(/databases/$(database)/documents/users/$(request.auth.uid)))
+        // Referral system: Another user can update referrer's balance ONLY IF they are making an investment and triggering a bonus
+        (request.auth.uid != userId && incoming().diff(existing()).affectedKeys().hasOnly(['balance', 'referralEarnings']))
       );
     }
 

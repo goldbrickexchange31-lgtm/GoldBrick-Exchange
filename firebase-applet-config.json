@@ -1,10 +1,9 @@
 {
-  "projectId": "gen-lang-client-0494127949",
-  "appId": "1:159687444580:web:5eeb9b9e7deba2ef1c7771",
-  "apiKey": "AIzaSyDlXFlGzaxtvpAXrzMEv6Dpm4foYTetnB4",
-  "authDomain": "gen-lang-client-0494127949.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-ea749be8-2f23-4412-94ab-7c5b04dff757",
-  "storageBucket": "gen-lang-client-0494127949.firebasestorage.app",
-  "messagingSenderId": "159687444580",
-  "measurementId": ""
+  "projectId": "goldbrick-cd2b5",
+  "appId": "1:390165274318:web:1dc2018ed92d4dc0a77a9f",
+  "apiKey": "AIzaSyASBcntcqxMiVjX6VngCbO6TqUPXFXfgCk",
+  "authDomain": "goldbrick-cd2b5.firebaseapp.com",
+  "storageBucket": "goldbrick-cd2b5.firebasestorage.app",
+  "messagingSenderId": "390165274318",
+  "measurementId": "G-S9KR91XEC8"
 }

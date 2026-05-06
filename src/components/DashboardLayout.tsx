@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     navigate('/');
   };
 
-  const adminEmails = ['btechtools.ng@gmail.com', 'goldbrickexchange31@gmail.com'];
+  const adminEmails = ['goldbrickexchange31@gmail.com'];
   const isAdmin = userData?.role === 'admin' || (auth.currentUser?.email && adminEmails.includes(auth.currentUser.email));
 
   return (

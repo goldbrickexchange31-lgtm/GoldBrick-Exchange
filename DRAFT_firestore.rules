@@ -15,10 +15,10 @@ service cloud.firestore {
     function existing() { return resource.data; }
     function isAdmin() { 
       // Note: We use get() on the user document to check current role.
-      // Admin email from runtime: btechtools.ng@gmail.com
+      // Admin email from runtime: goldbrickexchange31@gmail.com
       return isSignedIn() && (
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-        request.auth.token.email == 'btechtools.ng@gmail.com'
+        request.auth.token.email == 'goldbrickexchange31@gmail.com'
       );
     }
 

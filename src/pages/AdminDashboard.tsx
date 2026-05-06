@@ -62,7 +62,9 @@ import {
   setDoc,
   addDoc,
   serverTimestamp,
-  where
+  where,
+  getDocs,
+  writeBatch
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { toast } from 'sonner';
@@ -362,6 +364,66 @@ export default function AdminDashboard() {
       toast.success(`User status updated to ${newStatus}`);
     } catch (e: any) {
       toast.error('Error updating status');
+    }
+  };
+
+  const handleSystemReset = async () => {
+    if (!window.confirm('WARNING: This will delete ALL users (except admins), all transactions, all investments, and all chats. This cannot be undone. Are you sure?')) {
+      return;
+    }
+    
+    if (!window.confirm('FINAL WARNING: Everything will be wiped. This is intended for site launch reset. Proceed?')) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const adminEmail = auth.currentUser?.email;
+      
+      // 1. Wipe collections
+      const simpleCollections = ['investments', 'transactions'];
+      for (const collName of simpleCollections) {
+        const snap = await getDocs(collection(db, collName));
+        for (const doc of snap.docs) {
+          await deleteDoc(doc.ref);
+        }
+      }
+
+      // 2. Wipe Chats
+      const chatSnap = await getDocs(collection(db, 'chats'));
+      for (const chatDoc of chatSnap.docs) {
+        const msgSnap = await getDocs(collection(chatDoc.ref, 'messages'));
+        for (const m of msgSnap.docs) {
+          await deleteDoc(m.ref);
+        }
+        await deleteDoc(chatDoc.ref);
+      }
+
+      // 3. Wipe Users (except admins)
+      const userSnap = await getDocs(collection(db, 'users'));
+      for (const uDoc of userSnap.docs) {
+        const data = uDoc.data();
+        const isProtected = data.role === 'admin' || data.email === adminEmail || data.email === 'goldbrickexchange31@gmail.com';
+        if (!isProtected) {
+          await deleteDoc(uDoc.ref);
+        } else {
+           // Reset stats
+           await updateDoc(uDoc.ref, {
+             balance: 0,
+             totalInvested: 0,
+             totalProfit: 0,
+             referralEarnings: 0
+           });
+        }
+      }
+
+      toast.success('System Reset Complete. Platform is now clean.');
+      setActiveSection('overview');
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`Reset Failed: ${e.message}. Ensure you have deletion permissions in Firestore rules.`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1024,10 +1086,30 @@ export default function AdminDashboard() {
                   </Card>
                </div>
 
-               <div className="flex justify-center">
+               <div className="flex flex-col items-center gap-8">
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
                      Save All Settings <Check className="ml-2 size-5" />
                   </Button>
+
+                  <Card className="w-full max-w-sm bg-red-500/5 border-red-500/20 rounded-3xl overflow-hidden border">
+                    <CardHeader className="p-6 border-b border-red-500/10">
+                      <CardTitle className="text-sm font-black uppercase italic tracking-tighter text-red-500 flex items-center gap-2">
+                        <Trash2 className="size-4" /> Danger Zone
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-4 italic">
+                        Perform a full system reset before site launch. This will delete all user data except admin accounts.
+                      </p>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full bg-red-500 text-white font-black uppercase text-[10px] h-12 rounded-2xl hover:bg-red-600 transition-all shadow-md"
+                        onClick={handleSystemReset}
+                      >
+                        Wipe Platform Data
+                      </Button>
+                    </CardContent>
+                  </Card>
                </div>
             </div>
           )}
