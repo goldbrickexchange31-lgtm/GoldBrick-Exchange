@@ -149,6 +149,104 @@ async function matureInvestments() {
   }
 }
 
+// Push Notification Service
+async function startNotificationListener() {
+  console.log('[SYSTEM] Initializing Push Notification Listener...');
+  try {
+    const firestore = getDb();
+    const messaging = admin.messaging();
+
+    // Listen for changes in chats
+    firestore.collection('chats').onSnapshot(async (snapshot) => {
+      const changes = snapshot.docChanges();
+      
+      for (const change of changes) {
+        if (change.type === 'added' || change.type === 'modified') {
+          const chatData = change.doc.data();
+          
+          // Only trigger if unreadByAdmin is true
+          if (chatData.unreadByAdmin) {
+            console.log(`[PUSH] New message for admin from ${chatData.userName}`);
+            
+            // Find all admins
+            const adminSnap = await firestore.collection('users')
+              .where('role', '==', 'admin')
+              .get();
+            
+            const tokens: string[] = [];
+            adminSnap.forEach(uDoc => {
+              const uData = uDoc.data();
+              if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                tokens.push(...uData.fcmTokens);
+              }
+            });
+
+            // Fallback: Check for the specific master admin email if tokens is empty
+            if (tokens.length === 0) {
+              const fallbackSnap = await firestore.collection('users')
+                .where('email', 'in', ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'])
+                .get();
+              fallbackSnap.forEach(uDoc => {
+                const uData = uDoc.data();
+                if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                  tokens.push(...uData.fcmTokens);
+                }
+              });
+            }
+
+            if (tokens.length > 0) {
+              const uniqueTokens = Array.from(new Set(tokens));
+              const message = {
+                notification: {
+                  title: `New Message from ${chatData.userName}`,
+                  body: chatData.lastMessage || 'Click to reply in dashboard.',
+                },
+                webpush: {
+                  fcm_options: {
+                    link: 'https://ais-dev-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
+                  },
+                  notification: {
+                    icon: 'https://goldbrickexchange.app/logo.png', // Fallback URL
+                    badge: 'https://goldbrickexchange.app/logo.png'
+                  }
+                },
+                tokens: uniqueTokens
+              };
+
+              try {
+                const response = await messaging.sendEachForMulticast(message);
+                console.log(`[PUSH] Successfully sent ${response.successCount} notifications to ${uniqueTokens.length} devices`);
+                if (response.failureCount > 0) {
+                  // Clean up stale tokens
+                  const staleTokens: string[] = [];
+                  response.responses.forEach((resp, idx) => {
+                    if (!resp.success) {
+                      const error = resp.error as any;
+                      if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
+                        staleTokens.push(uniqueTokens[idx]);
+                      }
+                    }
+                  });
+                  
+                  if (staleTokens.length > 0) {
+                    console.log(`[PUSH] Cleaning up ${staleTokens.length} stale tokens`);
+                  }
+                }
+              } catch (pushErr) {
+                console.error('[PUSH] Error sending push:', pushErr);
+              }
+            }
+          }
+        }
+      }
+    }, (err) => {
+      console.error('[PUSH] Snapshot error:', err);
+    });
+  } catch (err) {
+    console.error('[PUSH] Failed to start listener:', err);
+  }
+}
+
 // Configure Cloudinary
 const CLOUDINARY_DEFAULT_NAME = 'dvx1hj8ax';
 const CLOUDINARY_DEFAULT_KEY = '961765732187325';
@@ -251,6 +349,9 @@ if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
       console.log('[SYSTEM] Starting maturity checker...');
       matureInvestments();
       setInterval(matureInvestments, 60000);
+      
+      console.log('[SYSTEM] Starting notification listener...');
+      startNotificationListener();
     });
   }).catch(err => {
     console.error('[SYSTEM] Failed to start server:', err);

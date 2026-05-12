@@ -50,6 +50,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
+import { requestNotificationPermission, onForegroundMessage } from '../lib/notifications';
 import { 
   collection, 
   query, 
@@ -150,6 +151,22 @@ export default function AdminDashboard() {
     const unsubConfig = onSnapshot(doc(db, 'config', 'general'), (snap) => {
       if (snap.exists()) setConfig(snap.data());
     }, (e) => handleFirestoreError(e, OperationType.GET, 'config/general'));
+
+    // Notification Setup
+    if (auth.currentUser) {
+      requestNotificationPermission(auth.currentUser.uid);
+      const unsubscribeForeground = onForegroundMessage();
+      
+      // Cleanup notification listener on unmount
+      return () => {
+        unsubUsers();
+        unsubTx();
+        unsubPlans();
+        unsubWallets();
+        unsubConfig();
+        if (unsubscribeForeground) unsubscribeForeground();
+      };
+    }
 
     setLoading(false);
     return () => {
@@ -1087,6 +1104,14 @@ export default function AdminDashboard() {
                </div>
 
                <div className="flex flex-col items-center gap-8">
+                  <Button 
+                     variant="outline"
+                     className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
+                     onClick={() => auth.currentUser && requestNotificationPermission(auth.currentUser.uid).then(() => toast.success('Notifications enabled!'))}
+                  >
+                     <ShieldAlert className="mr-2 size-4" /> Enable Desktop Notifications
+                  </Button>
+                  
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
                      Save All Settings <Check className="ml-2 size-5" />
                   </Button>

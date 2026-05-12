@@ -68,7 +68,8 @@ export default function SupportPage() {
         lastActive: serverTimestamp(),
         userName: userData?.displayName,
         userEmail: userData?.email,
-        userId: user.uid
+        userId: user.uid,
+        unreadByAdmin: true
       }, { merge: true });
     } catch (error) {
       toast.error('Failed to send message');
