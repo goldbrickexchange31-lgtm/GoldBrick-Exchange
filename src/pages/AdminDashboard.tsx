@@ -466,7 +466,7 @@ export default function AdminDashboard() {
 
   const handleTestNotification = async () => {
     if (!auth.currentUser) return;
-    const toastId = toast.loading('Sending test notification...');
+    const toastId = toast.loading('Establishing secure notification link...');
     try {
       const response = await fetch('/api/test-notification', {
         method: 'POST',
@@ -477,14 +477,17 @@ export default function AdminDashboard() {
           body: 'Pixel-perfect push notification system is online and active! 🎖️'
         })
       });
+      
       const data = await response.json();
-      if (data.success && data.successCount > 0) {
-        toast.success(`Success! Sent to ${data.successCount} registered devices.`, { id: toastId });
+      if (response.ok && data.success && data.successCount > 0) {
+        toast.success(`Success! Handshake confirmed on ${data.successCount} devices.`, { id: toastId });
       } else {
-        toast.error(`Failed: ${data.errorMessages?.[0] || 'No active tokens found. Please sync first.'}`, { id: toastId });
+        const errorMsg = data.error || (data.errorMessages && data.errorMessages[0]) || 'Handshake failed. No active tokens found.';
+        toast.error(`Protocol Error: ${errorMsg}`, { id: toastId });
+        console.error('Server notification error:', data);
       }
     } catch (e) {
-      toast.error('Connection failed. Is the server running?', { id: toastId });
+      toast.error('System Connectivity Error: Link failed.', { id: toastId });
     }
   };
 
@@ -1134,9 +1137,9 @@ export default function AdminDashboard() {
                   <div className="w-full max-w-sm p-6 bg-white/5 border border-border rounded-2xl mb-4 text-center">
                     <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Notification Connectivity</p>
                     <div className="flex items-center justify-center gap-2">
-                      <div className={`size-3 rounded-full ${users.find(u => (u.uid || u.id) === auth.currentUser?.uid)?.fcmTokens?.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
+                      <div className={`size-3 rounded-full ${userData?.fcmTokens && userData.fcmTokens.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
                       <span className="text-xs font-bold text-white uppercase italic">
-                        {users.find(u => (u.uid || u.id) === auth.currentUser?.uid)?.fcmTokens?.length || 0} Registered Devices
+                        {userData?.fcmTokens?.length || 0} Registered Devices
                       </span>
                     </div>
                   </div>
@@ -1144,10 +1147,16 @@ export default function AdminDashboard() {
                   <Button 
                      variant="outline"
                      className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
-                     onClick={() => auth.currentUser && requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                        if (token) toast.success('Notifications active on this device!');
-                        else toast.error('Permission blocked or setup failed.');
-                     })}
+                     onClick={() => {
+                        if (!auth.currentUser) return;
+                        const tId = toast.loading('Synchronizing device with GOLDBRICK Vault...');
+                        requestNotificationPermission(auth.currentUser.uid).then((token) => {
+                          if (token) toast.success('Active link established on this device!', { id: tId });
+                          else toast.error('Permission denied or Handshake timeout.', { id: tId });
+                        }).catch(() => {
+                           toast.error('Protocol failed. Please refresh and try again.', { id: tId });
+                        });
+                     }}
                   >
                      <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
                   </Button>
@@ -1394,12 +1403,13 @@ function AdminChatManager() {
 
   // Handle load scroll and new messages
   useEffect(() => {
-    if (messages.length > 0) {
+    if (messages.length > 0 && selectedChat) {
+      // Small timeout to allow DOM to render
       setTimeout(() => {
-        scrollRef.current?.scrollIntoView({ behavior: 'auto' });
-      }, 100);
+        scrollRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }, 150);
     }
-  }, [messages.length, selectedChat]);
+  }, [messages.length, selectedChat?.id]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();

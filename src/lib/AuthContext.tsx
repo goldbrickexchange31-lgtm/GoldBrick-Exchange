@@ -15,6 +15,8 @@ interface UserData {
   referredBy?: string | null;
   role: 'user' | 'admin';
   status: 'active' | 'suspended';
+  fcmTokens?: string[];
+  lastTokenUpdate?: string;
 }
 
 interface AuthContextType {

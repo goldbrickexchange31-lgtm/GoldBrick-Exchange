@@ -52,8 +52,8 @@ export default function SupportPage() {
     if (messages.length > 0) {
       // Small timeout to allow DOM to render
       setTimeout(() => {
-        scrollRef.current?.scrollIntoView({ behavior: 'auto' });
-      }, 100);
+        scrollRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+      }, 150);
     }
   }, [messages.length]);
 

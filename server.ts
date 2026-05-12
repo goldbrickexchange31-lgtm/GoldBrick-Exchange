@@ -179,9 +179,9 @@ async function startNotificationListener() {
               }
             });
 
-            // Always check for these specific master emails to be safe
+            // Always check for this specific master email to be safe
             const masterSnap = await firestore.collection('users')
-              .where('email', 'in', ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'])
+              .where('email', '==', 'goldbrickexchange31@gmail.com')
               .get();
             masterSnap.forEach(uDoc => {
               const uData = uDoc.data();
@@ -191,7 +191,9 @@ async function startNotificationListener() {
             });
 
             if (tokens.length > 0) {
-              const uniqueTokens = Array.from(new Set(tokens));
+              const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
+              if (uniqueTokens.length === 0) return;
+
               console.log(`[PUSH] Dispatching to ${uniqueTokens.length} tokens for admins`);
               
               const message = {
@@ -216,14 +218,6 @@ async function startNotificationListener() {
               try {
                 const response = await messaging.sendEachForMulticast(message);
                 console.log(`[PUSH] Result: ${response.successCount} success, ${response.failureCount} failed.`);
-                
-                if (response.failureCount > 0) {
-                  response.responses.forEach((resp, idx) => {
-                    if (!resp.success) {
-                      console.error(`[PUSH] Token ${idx} failed:`, resp.error?.message);
-                    }
-                  });
-                }
               } catch (pushErr) {
                 console.error('[PUSH] Multicast error:', pushErr);
               }
@@ -234,7 +228,65 @@ async function startNotificationListener() {
         }
       }
     }, (err) => {
-      console.error('[PUSH] Snapshot error:', err);
+      console.error('[PUSH] Chat snapshot error:', err);
+    });
+
+    // Listen for new deposits
+    firestore.collection('transactions')
+      .where('type', '==', 'deposit')
+      .where('status', '==', 'pending')
+      .onSnapshot(async (snapshot) => {
+      const changes = snapshot.docChanges();
+      for (const change of changes) {
+        if (change.type === 'added') {
+          const tx = change.doc.data();
+          const createdAt = tx.createdAt?.toDate ? tx.createdAt.toDate() : new Date();
+          
+          // Only notify for fresh records (within last 10 seconds) to avoid duplicate on restart
+          if (new Date().getTime() - createdAt.getTime() < 10000) {
+            console.log(`[PUSH-DEPOSIT] New deposit detected: $${tx.amount} from ${tx.userName}`);
+            
+            // Get Admin tokens
+            const tokens: string[] = [];
+            const adminSnap = await firestore.collection('users')
+              .where('email', 'in', ['goldbrickexchange31@gmail.com'])
+              .get();
+            
+            adminSnap.forEach(uDoc => {
+              const uData = uDoc.data();
+              if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                tokens.push(...uData.fcmTokens);
+              }
+            });
+
+            if (tokens.length > 0) {
+              const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
+              if (uniqueTokens.length === 0) return;
+
+              const message = {
+                notification: {
+                  title: "💰 NEW DEPOSIT ALERT",
+                  body: `${tx.userName} just submitted $${tx.amount} for audit. Verify details in Admin Dashboard.`,
+                },
+                webpush: {
+                  fcm_options: {
+                    link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
+                  },
+                  notification: {
+                    icon: 'https://goldbrickexchange.app/logo.png',
+                    badge: 'https://goldbrickexchange.app/logo.png',
+                    requireInteraction: true,
+                    vibrate: [200, 100, 50, 100, 200]
+                  }
+                },
+                tokens: uniqueTokens
+              };
+
+              await messaging.sendEachForMulticast(message).catch(e => console.error('[PUSH-DEPOSIT] Error:', e));
+            }
+          }
+        }
+      }
     });
   } catch (err) {
     console.error('[PUSH] Failed to start listener:', err);
@@ -357,13 +409,15 @@ async function configureApp() {
       console.log(`[TEST-PUSH] Found ${tokens?.length || 0} tokens for user ${userId} (Doc ID: ${userDoc.id})`);
 
       if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
-        return res.status(400).json({ error: "No FCM tokens found for this account. Click 'Sync Push Notifications' on this device first." });
+        return res.status(400).json({ error: "No FCM registration found in your database profile. Please click 'Sync Push Notifications' in settings and ensure browser allows notifications." });
       }
 
       const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
       if (uniqueTokens.length === 0) {
-        return res.status(400).json({ error: "Active registration tokens are invalid or expired." });
+        return res.status(400).json({ error: "No active valid tokens found. Your registrations are invalid or empty." });
       }
+
+      console.log(`[TEST-PUSH] Sending to tokens:`, uniqueTokens);
 
       const message = {
         notification: {
