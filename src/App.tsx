@@ -22,7 +22,7 @@ import TermsPage from './pages/TermsPage';
 
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) => {
   const { user, userData, loading } = useAuth();
-  const ADMIN_EMAILS = ['goldbrickexchange31@gmail.com'];
+  const ADMIN_EMAILS = ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'];
 
   if (loading) return <div className="h-screen w-screen flex flex-col items-center justify-center bg-background gap-6">
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-primary border-r-2 shadow-[0_0_20px_rgba(var(--primary),0.2)]"></div>

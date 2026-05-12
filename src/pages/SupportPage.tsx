@@ -43,10 +43,19 @@ export default function SupportPage() {
 
     const unsub = onSnapshot(q, (snap) => {
       setMessages(snap.docs.map(doc => doc.data()));
-      // Only scroll on first load or if it's clearly for a focused chat
     });
     return () => unsub();
   }, [user]);
+
+  // Handle load scroll and new messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      // Small timeout to allow DOM to render
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 100);
+    }
+  }, [messages.length]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,8 +71,10 @@ export default function SupportPage() {
         senderName: userData?.displayName,
         createdAt: serverTimestamp()
       });
-      // Scroll to bottom on user's own message
-      scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+      // Force scroll on send
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
       // Also update the main chat doc for admin to see "last active"
       await setDoc(doc(db, 'chats', user.uid), {
         lastMessage: msg,

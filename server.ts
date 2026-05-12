@@ -12,14 +12,14 @@ const __dirname = path.dirname(__filename);
 
 // Firebase Config (Must match client)
 const firebaseConfig = {
-  projectId: "gen-lang-client-0494127949",
-  appId: "1:159687444580:web:5eeb9b9e7deba2ef1c7771",
-  apiKey: "AIzaSyDlXFlGzaxtvpAXrzMEv6Dpm4foYTetnB4",
-  authDomain: "gen-lang-client-0494127949.firebaseapp.com",
-  databaseId: "ai-studio-ea749be8-2f23-4412-94ab-7c5b04dff757", // Use the custom database ID
+  projectId: "goldbrick-cd2b5",
+  appId: "1:390165274318:web:1dc2018ed92d4dc0a77a9f",
+  apiKey: "AIzaSyASBcntcqxMiVjX6VngCbO6TqUPXFXfgCk",
+  authDomain: "goldbrick-cd2b5.firebaseapp.com",
+  messagingSenderId: "390165274318",
 };
 
-// Initialize Admin SDK safely for serverless
+// Initialize Admin SDK safely
 let firebaseApp: admin.app.App | null = null;
 let db: admin.firestore.Firestore | null = null;
 
@@ -36,12 +36,10 @@ function getDb() {
     }
 
     db = admin.firestore(firebaseApp);
-    if (firebaseConfig.databaseId) {
-      db.settings({
-        databaseId: firebaseConfig.databaseId,
-        ignoreUndefinedProperties: true
-      });
-    }
+    // Remove the custom databaseId setting as it's not present in client config
+    db.settings({
+      ignoreUndefinedProperties: true
+    });
     return db;
   } catch (error) {
     console.error('[FIREBASE] Admin initialization failed:', error);
@@ -203,7 +201,7 @@ async function startNotificationListener() {
                 },
                 webpush: {
                   fcm_options: {
-                    link: 'https://ais-dev-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
+                    link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
                   },
                   notification: {
                     icon: 'https://goldbrickexchange.app/logo.png',
@@ -374,7 +372,7 @@ async function configureApp() {
         },
         webpush: {
           fcm_options: {
-            link: 'https://ais-dev-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin'
+            link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin'
           },
           notification: {
             icon: 'https://goldbrickexchange.app/logo.png',

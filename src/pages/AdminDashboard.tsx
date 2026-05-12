@@ -1134,9 +1134,9 @@ export default function AdminDashboard() {
                   <div className="w-full max-w-sm p-6 bg-white/5 border border-border rounded-2xl mb-4 text-center">
                     <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Notification Connectivity</p>
                     <div className="flex items-center justify-center gap-2">
-                      <div className={`size-3 rounded-full ${users.find(u => u.uid === auth.currentUser?.uid)?.fcmTokens?.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
+                      <div className={`size-3 rounded-full ${users.find(u => (u.uid || u.id) === auth.currentUser?.uid)?.fcmTokens?.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
                       <span className="text-xs font-bold text-white uppercase italic">
-                        {users.find(u => u.uid === auth.currentUser?.uid)?.fcmTokens?.length || 0} Registered Devices
+                        {users.find(u => (u.uid || u.id) === auth.currentUser?.uid)?.fcmTokens?.length || 0} Registered Devices
                       </span>
                     </div>
                   </div>
@@ -1392,6 +1392,15 @@ function AdminChatManager() {
     return () => unsub();
   }, [selectedChat]);
 
+  // Handle load scroll and new messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 100);
+    }
+  }, [messages.length, selectedChat]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || !selectedChat) return;
@@ -1406,7 +1415,11 @@ function AdminChatManager() {
         senderName: 'Admin Support',
         createdAt: serverTimestamp()
       });
-      scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+      
+      // Force scroll on send
+      setTimeout(() => {
+        scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
 
       await updateDoc(doc(db, 'chats', selectedChat.id), {
         lastMessage: msg,
