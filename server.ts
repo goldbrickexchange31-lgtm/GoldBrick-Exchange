@@ -331,6 +331,57 @@ async function configureApp() {
     });
   }
 
+  // Test Notification Endpoint
+  expressApp.post("/api/test-notification", async (req, res) => {
+    try {
+      const { userId, title, body } = req.body;
+      if (!userId) return res.status(400).json({ error: "userId required" });
+
+      const firestore = getDb();
+      const messaging = admin.messaging();
+      
+      const userDoc = await firestore.collection('users').doc(userId).get();
+      if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+      
+      const tokens = userDoc.data()?.fcmTokens;
+      if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
+        return res.status(400).json({ error: "No FCM tokens found for this user. Please click 'Sync Push Notifications' first." });
+      }
+
+      console.log(`[TEST-PUSH] Sending to ${tokens.length} devices for ${userId}`);
+
+      const message = {
+        notification: {
+          title: title || "GOLDBRICK System Alert",
+          body: body || "Pixel perfect notification test is successful. Ready to receive alerts.",
+        },
+        webpush: {
+          fcm_options: {
+            link: 'https://ais-dev-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin'
+          },
+          notification: {
+            icon: 'https://goldbrickexchange.app/logo.png',
+            badge: 'https://goldbrickexchange.app/logo.png',
+            requireInteraction: true,
+            vibrate: [200, 100, 200]
+          }
+        },
+        tokens: tokens
+      };
+
+      const response = await messaging.sendEachForMulticast(message);
+      res.json({ 
+        success: true, 
+        successCount: response.successCount, 
+        failureCount: response.failureCount,
+        errorMessages: response.responses.filter(r => !r.success).map(r => r.error?.message)
+      });
+    } catch (err: any) {
+      console.error("[TEST-PUSH] Critical Error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   return expressApp;
 }
 

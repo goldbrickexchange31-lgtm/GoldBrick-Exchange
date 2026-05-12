@@ -47,7 +47,8 @@ import {
   History,
   Share2,
   ExternalLink,
-  LogOut
+  LogOut,
+  Send
 } from 'lucide-react';
 import { db, auth } from '../lib/firebase';
 import { requestNotificationPermission, onForegroundMessage } from '../lib/notifications';
@@ -154,9 +155,13 @@ export default function AdminDashboard() {
 
     // Notification Setup
     let unsubscribeForeground: () => void = () => {};
-    if (auth.currentUser) {
-      requestNotificationPermission(auth.currentUser.uid);
-      unsubscribeForeground = onForegroundMessage();
+    try {
+      if (auth.currentUser) {
+        requestNotificationPermission(auth.currentUser.uid).catch(console.error);
+        unsubscribeForeground = onForegroundMessage();
+      }
+    } catch (e) {
+      console.error("Notification setup failed", e);
     }
 
     setLoading(false);
@@ -452,6 +457,36 @@ export default function AdminDashboard() {
     { id: 'chat', label: 'Support Chat', icon: MessageSquare },
     { id: 'settings', label: 'Site Settings', icon: Settings },
   ];
+
+  useEffect(() => {
+    // Reset scroll when switching section
+    const mainContent = document.querySelector('.overflow-y-auto');
+    if (mainContent) mainContent.scrollTo(0, 0);
+  }, [activeSection]);
+
+  const handleTestNotification = async () => {
+    if (!auth.currentUser) return;
+    const toastId = toast.loading('Sending test notification...');
+    try {
+      const response = await fetch('/api/test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: auth.currentUser.uid,
+          title: 'GOLDBRICK MASTER ALERT',
+          body: 'Pixel-perfect push notification system is online and active! 🎖️'
+        })
+      });
+      const data = await response.json();
+      if (data.success && data.successCount > 0) {
+        toast.success(`Success! Sent to ${data.successCount} registered devices.`, { id: toastId });
+      } else {
+        toast.error(`Failed: ${data.errorMessages?.[0] || 'No active tokens found. Please sync first.'}`, { id: toastId });
+      }
+    } catch (e) {
+      toast.error('Connection failed. Is the server running?', { id: toastId });
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -1115,6 +1150,14 @@ export default function AdminDashboard() {
                      })}
                   >
                      <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
+                  </Button>
+                  
+                  <Button 
+                     variant="outline"
+                     className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all mb-4"
+                     onClick={handleTestNotification}
+                  >
+                     <Send className="mr-2 size-4" /> Send Test Notification
                   </Button>
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
