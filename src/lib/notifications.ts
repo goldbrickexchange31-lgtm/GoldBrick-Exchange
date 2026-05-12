@@ -14,8 +14,9 @@ export async function requestNotificationPermission(userId: string) {
 
   try {
     // 1. Register Service Worker explicitly
+    let registration;
     if ('serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
       console.log('Service Worker registered:', registration.scope);
     }
 
@@ -25,7 +26,7 @@ export async function requestNotificationPermission(userId: string) {
       // 3. Get Token
       const token = await getToken(messaging, { 
         vapidKey: VAPID_KEY,
-        // Passing the service worker registration can help in some environments
+        serviceWorkerRegistration: registration
       });
 
       if (token) {

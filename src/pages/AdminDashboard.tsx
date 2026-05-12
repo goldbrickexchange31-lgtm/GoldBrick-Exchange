@@ -153,19 +153,10 @@ export default function AdminDashboard() {
     }, (e) => handleFirestoreError(e, OperationType.GET, 'config/general'));
 
     // Notification Setup
+    let unsubscribeForeground: () => void = () => {};
     if (auth.currentUser) {
       requestNotificationPermission(auth.currentUser.uid);
-      const unsubscribeForeground = onForegroundMessage();
-      
-      // Cleanup notification listener on unmount
-      return () => {
-        unsubUsers();
-        unsubTx();
-        unsubPlans();
-        unsubWallets();
-        unsubConfig();
-        if (unsubscribeForeground) unsubscribeForeground();
-      };
+      unsubscribeForeground = onForegroundMessage();
     }
 
     setLoading(false);
@@ -175,6 +166,7 @@ export default function AdminDashboard() {
       unsubPlans();
       unsubWallets();
       unsubConfig();
+      if (unsubscribeForeground) unsubscribeForeground();
     };
   }, []);
 

@@ -168,7 +168,7 @@ async function startNotificationListener() {
           if (chatData.unreadByAdmin) {
             console.log(`[PUSH] New message for admin from ${chatData.userName}`);
             
-            // Find all admins
+            // Find all potential recipients
             const adminSnap = await firestore.collection('users')
               .where('role', '==', 'admin')
               .get();
@@ -181,18 +181,16 @@ async function startNotificationListener() {
               }
             });
 
-            // Fallback: Check for the specific master admin email if tokens is empty
-            if (tokens.length === 0) {
-              const fallbackSnap = await firestore.collection('users')
-                .where('email', 'in', ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'])
-                .get();
-              fallbackSnap.forEach(uDoc => {
-                const uData = uDoc.data();
-                if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
-                  tokens.push(...uData.fcmTokens);
-                }
-              });
-            }
+            // Always check for these specific master emails to be safe
+            const masterSnap = await firestore.collection('users')
+              .where('email', 'in', ['goldbrickexchange31@gmail.com', 'btechtools.ng@gmail.com'])
+              .get();
+            masterSnap.forEach(uDoc => {
+              const uData = uDoc.data();
+              if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                tokens.push(...uData.fcmTokens);
+              }
+            });
 
             if (tokens.length > 0) {
               const uniqueTokens = Array.from(new Set(tokens));
