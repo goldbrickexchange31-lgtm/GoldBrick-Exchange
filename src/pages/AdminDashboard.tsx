@@ -1104,12 +1104,25 @@ export default function AdminDashboard() {
                </div>
 
                <div className="flex flex-col items-center gap-8">
+                  <div className="w-full max-w-sm p-6 bg-white/5 border border-border rounded-2xl mb-4 text-center">
+                    <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Notification Connectivity</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className={`size-3 rounded-full ${users.find(u => u.uid === auth.currentUser?.uid)?.fcmTokens?.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
+                      <span className="text-xs font-bold text-white uppercase italic">
+                        {users.find(u => u.uid === auth.currentUser?.uid)?.fcmTokens?.length || 0} Registered Devices
+                      </span>
+                    </div>
+                  </div>
+
                   <Button 
                      variant="outline"
                      className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
-                     onClick={() => auth.currentUser && requestNotificationPermission(auth.currentUser.uid).then(() => toast.success('Notifications enabled!'))}
+                     onClick={() => auth.currentUser && requestNotificationPermission(auth.currentUser.uid).then((token) => {
+                        if (token) toast.success('Notifications active on this device!');
+                        else toast.error('Permission blocked or setup failed.');
+                     })}
                   >
-                     <ShieldAlert className="mr-2 size-4" /> Enable Desktop Notifications
+                     <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
                   </Button>
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>

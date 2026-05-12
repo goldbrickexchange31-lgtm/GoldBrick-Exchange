@@ -196,6 +196,8 @@ async function startNotificationListener() {
 
             if (tokens.length > 0) {
               const uniqueTokens = Array.from(new Set(tokens));
+              console.log(`[PUSH] Dispatching to ${uniqueTokens.length} tokens for admins`);
+              
               const message = {
                 notification: {
                   title: `New Message from ${chatData.userName}`,
@@ -206,8 +208,10 @@ async function startNotificationListener() {
                     link: 'https://ais-dev-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
                   },
                   notification: {
-                    icon: 'https://goldbrickexchange.app/logo.png', // Fallback URL
-                    badge: 'https://goldbrickexchange.app/logo.png'
+                    icon: 'https://goldbrickexchange.app/logo.png',
+                    badge: 'https://goldbrickexchange.app/logo.png',
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200]
                   }
                 },
                 tokens: uniqueTokens
@@ -215,26 +219,20 @@ async function startNotificationListener() {
 
               try {
                 const response = await messaging.sendEachForMulticast(message);
-                console.log(`[PUSH] Successfully sent ${response.successCount} notifications to ${uniqueTokens.length} devices`);
+                console.log(`[PUSH] Result: ${response.successCount} success, ${response.failureCount} failed.`);
+                
                 if (response.failureCount > 0) {
-                  // Clean up stale tokens
-                  const staleTokens: string[] = [];
                   response.responses.forEach((resp, idx) => {
                     if (!resp.success) {
-                      const error = resp.error as any;
-                      if (error.code === 'messaging/registration-token-not-registered' || error.code === 'messaging/invalid-registration-token') {
-                        staleTokens.push(uniqueTokens[idx]);
-                      }
+                      console.error(`[PUSH] Token ${idx} failed:`, resp.error?.message);
                     }
                   });
-                  
-                  if (staleTokens.length > 0) {
-                    console.log(`[PUSH] Cleaning up ${staleTokens.length} stale tokens`);
-                  }
                 }
               } catch (pushErr) {
-                console.error('[PUSH] Error sending push:', pushErr);
+                console.error('[PUSH] Multicast error:', pushErr);
               }
+            } else {
+              console.log('[PUSH] Skip: No FCM tokens found for admins');
             }
           }
         }

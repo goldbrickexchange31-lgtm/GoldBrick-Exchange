@@ -13,23 +13,36 @@ export async function requestNotificationPermission(userId: string) {
   if (!messaging) return null;
 
   try {
+    // 1. Register Service Worker explicitly
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      console.log('Service Worker registered:', registration.scope);
+    }
+
+    // 2. Request Permission
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
-      const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      // 3. Get Token
+      const token = await getToken(messaging, { 
+        vapidKey: VAPID_KEY,
+        // Passing the service worker registration can help in some environments
+      });
+
       if (token) {
-        console.log('FCM Token:', token);
-        // Store the token in the user's profile so we can send pushes to them
+        console.log('FCM Token Generated:', token);
+        // Store the token in the user's profile
         const userRef = doc(db, 'users', userId);
         await updateDoc(userRef, {
-          fcmTokens: arrayUnion(token)
+          fcmTokens: arrayUnion(token),
+          lastTokenUpdate: new Date().toISOString()
         });
         return token;
       }
     } else {
-      console.warn('Notification permission not granted.');
+      console.warn('Notification permission denied by user.');
     }
   } catch (error) {
-    console.error('Error getting notification token:', error);
+    console.error('Error in requestNotificationPermission:', error);
   }
   return null;
 }
