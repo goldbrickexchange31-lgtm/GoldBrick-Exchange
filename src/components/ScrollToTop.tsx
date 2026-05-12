@@ -18,12 +18,14 @@ export default function ScrollToTop() {
     resetScroll();
     const timer = setTimeout(resetScroll, 100);
     const timer2 = setTimeout(resetScroll, 300);
-    const timer3 = setTimeout(resetScroll, 1000); // Final attempt for complex pages
+    const timer3 = setTimeout(resetScroll, 600);
+    const timer4 = setTimeout(resetScroll, 1200); 
     
     return () => {
       clearTimeout(timer);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timer4);
     };
   }, [pathname]);
 

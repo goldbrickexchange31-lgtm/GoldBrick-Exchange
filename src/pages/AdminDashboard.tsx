@@ -50,6 +50,7 @@ import {
   LogOut,
   Send
 } from 'lucide-react';
+import { useAuth } from '../lib/AuthContext';
 import { db, auth } from '../lib/firebase';
 import { requestNotificationPermission, onForegroundMessage } from '../lib/notifications';
 import { 
@@ -77,6 +78,7 @@ import { handleFirestoreError, OperationType } from '../lib/errorHandlers';
 type Section = 'overview' | 'users' | 'investment' | 'deposit' | 'withdrawal' | 'chat' | 'settings' | 'wallets';
 
 export default function AdminDashboard() {
+  const { userData } = useAuth();
   const [activeSection, setActiveSection] = useState<Section>('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
