@@ -28,9 +28,21 @@ function getDb() {
   
   try {
     if (!admin.apps.length) {
-      firebaseApp = admin.initializeApp({
-        projectId: firebaseConfig.projectId,
-      });
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+      
+      if (serviceAccount) {
+        console.log('[FIREBASE] Initializing with service account from ENV');
+        const cert = JSON.parse(serviceAccount);
+        firebaseApp = admin.initializeApp({
+          credential: admin.credential.cert(cert),
+          projectId: firebaseConfig.projectId,
+        });
+      } else {
+        console.log('[FIREBASE] Initializing with projectId (Falling back to default credentials)');
+        firebaseApp = admin.initializeApp({
+          projectId: firebaseConfig.projectId,
+        });
+      }
     } else {
       firebaseApp = admin.app();
     }

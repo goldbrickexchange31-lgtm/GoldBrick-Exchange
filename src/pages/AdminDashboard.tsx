@@ -135,25 +135,25 @@ export default function AdminDashboard() {
   useEffect(() => {
     const unsubUsers = onSnapshot(query(collection(db, 'users'), orderBy('createdAt', 'desc')), (snap) => {
       setUsers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (e) => handleFirestoreError(e, OperationType.LIST, 'users'));
+    }, (e) => console.error('Users snapshot error:', e));
 
     const unsubTx = onSnapshot(query(collection(db, 'transactions'), orderBy('createdAt', 'desc')), (snap) => {
       setTransactions(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (e) => handleFirestoreError(e, OperationType.LIST, 'transactions'));
+    }, (e) => console.error('Transactions snapshot error:', e));
 
     const unsubPlans = onSnapshot(collection(db, 'plans'), (snap) => {
       const sortedPlans = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any))
         .sort((a, b) => (a.minDeposit || 0) - (b.minDeposit || 0));
       setPlans(sortedPlans);
-    }, (e) => handleFirestoreError(e, OperationType.LIST, 'plans'));
+    }, (e) => console.error('Plans snapshot error:', e));
 
     const unsubWallets = onSnapshot(collection(db, 'wallets'), (snap) => {
       setWallets(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (e) => handleFirestoreError(e, OperationType.LIST, 'wallets'));
+    }, (e) => console.error('Wallets snapshot error:', e));
 
     const unsubConfig = onSnapshot(doc(db, 'config', 'general'), (snap) => {
-      if (snap.exists()) setConfig(snap.data());
-    }, (e) => handleFirestoreError(e, OperationType.GET, 'config/general'));
+      if (snap.exists()) setConfig(prev => ({ ...prev, ...snap.data() }));
+    }, (e) => console.error('Config snapshot error:', e));
 
     // Notification Setup
     let unsubscribeForeground: () => void = () => {};
@@ -1391,7 +1391,7 @@ function AdminChatManager() {
     const unsub = onSnapshot(query(collection(db, 'chats'), orderBy('lastActive', 'desc')), (snap) => {
       setChats(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       setLoading(false);
-    }, (e) => handleFirestoreError(e, OperationType.LIST, 'chats'));
+    }, (e) => console.error('Chats list error:', e));
     return () => unsub();
   }, []);
 
@@ -1399,7 +1399,7 @@ function AdminChatManager() {
     if (!selectedChat) return;
     const unsub = onSnapshot(query(collection(db, 'chats', selectedChat.id, 'messages'), orderBy('createdAt', 'asc')), (snap) => {
       setMessages(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (e) => handleFirestoreError(e, OperationType.LIST, `chats/${selectedChat.id}/messages`));
+    }, (e) => console.error('Chat messages error:', e));
     return () => unsub();
   }, [selectedChat]);
 
