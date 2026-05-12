@@ -1388,7 +1388,6 @@ function AdminChatManager() {
     if (!selectedChat) return;
     const unsub = onSnapshot(query(collection(db, 'chats', selectedChat.id, 'messages'), orderBy('createdAt', 'asc')), (snap) => {
       setMessages(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }, (e) => handleFirestoreError(e, OperationType.LIST, `chats/${selectedChat.id}/messages`));
     return () => unsub();
   }, [selectedChat]);
@@ -1407,6 +1406,7 @@ function AdminChatManager() {
         senderName: 'Admin Support',
         createdAt: serverTimestamp()
       });
+      scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
 
       await updateDoc(doc(db, 'chats', selectedChat.id), {
         lastMessage: msg,

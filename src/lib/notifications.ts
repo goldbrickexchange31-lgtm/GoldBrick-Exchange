@@ -5,7 +5,7 @@
 
 import { getToken, onMessage } from 'firebase/messaging';
 import { messaging, db } from './firebase';
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, setDoc, arrayUnion } from 'firebase/firestore';
 
 const VAPID_KEY = 'BAkQLF4_AddaRBbYyYlRIXK4RzVpKXruI8H4m7gYt-deu2crBG_8TjFpwrbkago89tcDfGkOl7tjsmvRGVNvs_c';
 
@@ -16,8 +16,12 @@ export async function requestNotificationPermission(userId: string) {
     // 1. Register Service Worker explicitly
     let registration;
     if ('serviceWorker' in navigator) {
-      registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+      registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+        scope: '/'
+      });
       console.log('Service Worker registered:', registration.scope);
+      // Wait for it to be active
+      await navigator.serviceWorker.ready;
     }
 
     // 2. Request Permission
@@ -31,12 +35,12 @@ export async function requestNotificationPermission(userId: string) {
 
       if (token) {
         console.log('FCM Token Generated:', token);
-        // Store the token in the user's profile
+        // Store the token in the user's profile using setDoc merge to ensure it works even if doc doesn't exist
         const userRef = doc(db, 'users', userId);
-        await updateDoc(userRef, {
+        await setDoc(userRef, {
           fcmTokens: arrayUnion(token),
           lastTokenUpdate: new Date().toISOString()
-        });
+        }, { merge: true });
         return token;
       }
     } else {

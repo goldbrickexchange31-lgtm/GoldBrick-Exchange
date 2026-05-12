@@ -340,20 +340,37 @@ async function configureApp() {
       const firestore = getDb();
       const messaging = admin.messaging();
       
-      const userDoc = await firestore.collection('users').doc(userId).get();
-      if (!userDoc.exists) return res.status(404).json({ error: "User not found" });
+      // Try finding by document ID first
+      let userDoc = await firestore.collection('users').doc(userId).get();
       
-      const tokens = userDoc.data()?.fcmTokens;
-      if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
-        return res.status(400).json({ error: "No FCM tokens found for this user. Please click 'Sync Push Notifications' first." });
+      // If not found by ID, search by uid field
+      if (!userDoc.exists) {
+        const querySnap = await firestore.collection('users').where('uid', '==', userId).limit(1).get();
+        if (!querySnap.empty) {
+          userDoc = querySnap.docs[0];
+        }
       }
 
-      console.log(`[TEST-PUSH] Sending to ${tokens.length} devices for ${userId}`);
+      if (!userDoc.exists) {
+        return res.status(404).json({ error: "User profile not found in database. Please ensure you are registered correctly." });
+      }
+      
+      const tokens = userDoc.data()?.fcmTokens;
+      console.log(`[TEST-PUSH] Found ${tokens?.length || 0} tokens for user ${userId} (Doc ID: ${userDoc.id})`);
+
+      if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
+        return res.status(400).json({ error: "No FCM tokens found for this account. Click 'Sync Push Notifications' on this device first." });
+      }
+
+      const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
+      if (uniqueTokens.length === 0) {
+        return res.status(400).json({ error: "Active registration tokens are invalid or expired." });
+      }
 
       const message = {
         notification: {
-          title: title || "GOLDBRICK System Alert",
-          body: body || "Pixel perfect notification test is successful. Ready to receive alerts.",
+          title: title || "GOLDBRICK MASTER ALERT",
+          body: body || "Your pixel-perfect notification system is active. All systems nominal.",
         },
         webpush: {
           fcm_options: {
@@ -363,10 +380,11 @@ async function configureApp() {
             icon: 'https://goldbrickexchange.app/logo.png',
             badge: 'https://goldbrickexchange.app/logo.png',
             requireInteraction: true,
-            vibrate: [200, 100, 200]
+            vibrate: [200, 100, 200],
+            tag: 'admin-alert' // Only show latest alert
           }
         },
-        tokens: tokens
+        tokens: uniqueTokens
       };
 
       const response = await messaging.sendEachForMulticast(message);
@@ -377,8 +395,8 @@ async function configureApp() {
         errorMessages: response.responses.filter(r => !r.success).map(r => r.error?.message)
       });
     } catch (err: any) {
-      console.error("[TEST-PUSH] Critical Error:", err);
-      res.status(500).json({ error: err.message });
+      console.error("[TEST-PUSH] Server Error:", err);
+      res.status(500).json({ error: "Internal notification server error: " + err.message });
     }
   });
 
