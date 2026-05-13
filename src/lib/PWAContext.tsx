@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface PWAContextType {
   isInstallable: boolean;
@@ -29,8 +30,14 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // If it's iOS and not already in standalone mode, it's "installable" manually
+    // If it's iOS and not already in standalone mode, it's "installable"
     if (isIOSDevice && !window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstallable(true);
+    }
+    
+    // Always consider it installable if not in standalone mode, 
+    // we will show a guide if beforeinstallprompt wasn't captured
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstallable(true);
     }
 
@@ -50,7 +57,11 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!deferredPromptGlobal) return;
+    if (!deferredPromptGlobal) {
+      // Fallback: tell user how to install manually
+      toast.info('To install: click your browser menu and select "Install App" or "Add to Home Screen"');
+      return;
+    }
 
     deferredPromptGlobal.prompt();
     const { outcome } = await deferredPromptGlobal.userChoice;

@@ -24,7 +24,6 @@ import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
 import { useAuth } from '../lib/AuthContext';
 import { usePWA } from '../lib/PWAContext';
-import { requestNotificationPermission } from '../lib/notifications';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -195,21 +194,6 @@ export default function Dashboard() {
     return realized + unrealized;
   }, [userData, allInvestments]);
 
-  const handleEnableNotifications = async () => {
-    if (!user) return;
-    const toastId = toast.loading('Connecting to GOLDBRICK Alert System...');
-    try {
-      const token = await requestNotificationPermission(user.uid);
-      if (token) {
-        toast.success('Active link established! You will now receive trade signals.', { id: toastId });
-      } else {
-        toast.error('GOLDBRICK handshaking failed. Please allow notifications in browser settings.', { id: toastId });
-      }
-    } catch (e) {
-      toast.error('System failure during handshake.', { id: toastId });
-    }
-  };
-
   return (
     <DashboardLayout>
       <IOSInstallGuide 
@@ -233,16 +217,6 @@ export default function Dashboard() {
                  <Download className="size-4 mr-2" /> Install App
                </Button>
              )}
-             {userData && Notification.permission !== 'granted' && (
-               <Button 
-                 onClick={handleEnableNotifications}
-                 variant="outline" 
-                 className="flex-1 md:flex-none border-blue-500/20 bg-blue-500/5 text-blue-400 font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-blue-500/10 transition-all shadow-lg shadow-blue-500/5"
-               >
-                 <Bell className="size-4 mr-2" /> Enable Alerts
-               </Button>
-             )}
-
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>

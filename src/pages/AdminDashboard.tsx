@@ -48,7 +48,8 @@ import {
   Share2,
   ExternalLink,
   LogOut,
-  Send
+  Send,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { db, auth } from '../lib/firebase';
@@ -1153,16 +1154,16 @@ export default function AdminDashboard() {
                      className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
                      onClick={() => {
                         if (!auth.currentUser) return;
-                        const tId = toast.loading('Synchronizing device with GOLDBRICK Vault...');
+                        const tId = toast.loading('Connecting GOLDBRICK Alert System...');
                         requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) toast.success('Active link established on this device!', { id: tId });
-                          else toast.error('Permission denied or Handshake timeout.', { id: tId });
+                          if (token) toast.success('GOLDBRICK Alerts Enabled!', { id: tId });
+                          else toast.error('Connection failed. Enable notifications in browser.', { id: tId });
                         }).catch(() => {
-                           toast.error('Protocol failed. Please refresh and try again.', { id: tId });
+                           toast.error('System synchronization failed.', { id: tId });
                         });
                      }}
                   >
-                     <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
+                     <Bell className="mr-2 size-4" /> Enable Admin Alerts
                   </Button>
                   
 
