@@ -26,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: payload.notification.icon || '/logo.png', // Fallback to a default icon
+    icon: payload.notification.icon || '/favicon.svg', // Fallback to a default icon
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
