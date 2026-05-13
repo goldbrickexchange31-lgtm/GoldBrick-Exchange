@@ -70,7 +70,7 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "h-12" }) =
         <div className="flex items-center gap-2 mt-1 px-1">
           <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
           <span className="text-[10px] font-bold text-primary tracking-[0.5em] uppercase leading-none">
-            EXCHANGE
+            INVESTMENTS
           </span>
           <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
         </div>
