@@ -4,9 +4,12 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Trophy, ShieldCheck, Zap, Users, ArrowRight, Star } from 'lucide-react';
+import { Trophy, ShieldCheck, Zap, Users, ArrowRight, Star, Download } from 'lucide-react';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 export default function LandingPage() {
+  const { isInstallable, handleInstallClick } = usePWAInstall();
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-hidden">
       {/* Navbar */}
@@ -44,12 +47,24 @@ export default function LandingPage() {
             Experience the world's most transparent and secure trading platform. 
             Smart automated returns, global asset management, and elite 24/7 support.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to="/register">
               <Button size="lg" className="bg-primary text-primary-foreground hover:opacity-90 font-bold px-8 h-14 text-lg w-full sm:w-auto shadow-xl shadow-primary/30">
                 Start Investing Now <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
+
+            {isInstallable && (
+              <Button 
+                onClick={handleInstallClick}
+                variant="outline" 
+                size="lg" 
+                className="border-primary/50 text-primary hover:bg-primary/10 font-bold px-8 h-14 text-lg w-full sm:w-auto"
+              >
+                <Download className="mr-2 w-5 h-5" /> Download App
+              </Button>
+            )}
+
             <div className="flex items-center gap-2 text-white/50 justify-center">
               <ShieldCheck className="text-primary w-5 h-5" />
               <span>100% Payout Guarantee</span>
@@ -164,7 +179,7 @@ export default function LandingPage() {
           <Link to="/">
             <Logo className="h-9 opacity-80 hover:opacity-100 transition-all" />
           </Link>
-          <div className="text-white/40 text-sm italic">© 2026 GoldBrick Investments. All rights reserved. Registered in USA.</div>
+          <div className="text-white/40 text-sm italic">© 2026 GoldBrick Exchange. All rights reserved. Registered in USA.</div>
           <div className="flex gap-6 text-sm text-white/40">
             <a href="#" className="hover:text-primary transition-colors">Terms</a>
             <a href="#" className="hover:text-primary transition-colors">Privacy</a>

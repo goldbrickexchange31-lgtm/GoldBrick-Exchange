@@ -3,30 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GoldBrick Investments – Financial Freedom Made Simple</title>
-    <meta name="description" content="A secure, premium-focused investment platform offering high-yield digital asset growth with real-time portfolio management." />
+    <title>GoldBrick Exchange – Financial Freedom Made Simple</title>
+    <meta name="description" content="Premium Gold Mining & Crypto Investment Platform" />
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app" />
-    <meta property="og:title" content="GoldBrick Investments – Financial Freedom Made Simple" />
-    <meta property="og:description" content="A secure, premium-focused investment platform offering high-yield digital asset growth with real-time portfolio management." />
+    <meta property="og:title" content="GoldBrick Exchange – Financial Freedom Made Simple" />
+    <meta property="og:description" content="Premium Gold Mining & Crypto Investment Platform" />
     <meta property="og:image" content="/og-banner.png" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app" />
-    <meta name="twitter:title" content="GoldBrick Investments – Financial Freedom Made Simple" />
-    <meta name="twitter:description" content="A secure, premium-focused investment platform offering high-yield digital asset growth with real-time portfolio management." />
+    <meta name="twitter:title" content="GoldBrick Exchange – Financial Freedom Made Simple" />
+    <meta name="twitter:description" content="Premium Gold Mining & Crypto Investment Platform" />
     <meta name="twitter:image" content="/og-banner.png" />
 
     <!-- Favicon & Theme Color -->
     <meta name="theme-color" content="#000B1E" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="GoldBrick" />
+    <link rel="apple-touch-icon" href="/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then(registration => {
+            console.log('SW registered: ', registration);
+          }).catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+          });
+        });
+      }
+    </script>
   </body>
 </html>
 
