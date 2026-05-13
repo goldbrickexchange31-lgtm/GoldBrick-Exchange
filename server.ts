@@ -218,8 +218,8 @@ async function startNotificationListener() {
                     link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
                   },
                   notification: {
-                    icon: 'https://goldbrickexchange.app/logo.png',
-                    badge: 'https://goldbrickexchange.app/logo.png',
+                    icon: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
+                    badge: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
                     requireInteraction: true,
                     vibrate: [200, 100, 200]
                   }
@@ -285,8 +285,8 @@ async function startNotificationListener() {
                     link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' 
                   },
                   notification: {
-                    icon: 'https://goldbrickexchange.app/logo.png',
-                    badge: 'https://goldbrickexchange.app/logo.png',
+                    icon: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
+                    badge: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
                     requireInteraction: true,
                     vibrate: [200, 100, 50, 100, 200]
                   }
@@ -441,8 +441,8 @@ async function configureApp() {
             link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin'
           },
           notification: {
-            icon: 'https://goldbrickexchange.app/logo.png',
-            badge: 'https://goldbrickexchange.app/logo.png',
+            icon: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
+            badge: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
             requireInteraction: true,
             vibrate: [200, 100, 200],
             tag: 'admin-alert' // Only show latest alert

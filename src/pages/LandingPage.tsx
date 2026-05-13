@@ -164,7 +164,7 @@ export default function LandingPage() {
           <Link to="/">
             <Logo className="h-9 opacity-80 hover:opacity-100 transition-all" />
           </Link>
-          <div className="text-white/40 text-sm italic">© 2024 GoldBrick Exchange. All rights reserved. Registered in USA.</div>
+          <div className="text-white/40 text-sm italic">© 2026 GoldBrick Investments. All rights reserved. Registered in USA.</div>
           <div className="flex gap-6 text-sm text-white/40">
             <a href="#" className="hover:text-primary transition-colors">Terms</a>
             <a href="#" className="hover:text-primary transition-colors">Privacy</a>
