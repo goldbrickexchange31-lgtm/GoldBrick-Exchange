@@ -40,8 +40,6 @@ service cloud.firestore {
              && data.totalInvested is number
              && data.referralEarnings is number
              && (!('profilePic' in data) || (data.profilePic is string && data.profilePic.size() <= 512))
-             && (!('fcmTokens' in data) || data.fcmTokens is list)
-             && (!('lastTokenUpdate' in data) || data.lastTokenUpdate is string)
              && (data.createdAt is timestamp || data.createdAt == null);
     }
 
@@ -98,7 +96,7 @@ service cloud.firestore {
         isAdmin() ||
         (request.auth.uid == userId && (
           // Allow specific field updates for users during investment or profile update or settlement
-          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'profilePic', 'balance', 'totalInvested', 'totalProfit', 'referralEarnings', 'fcmTokens', 'lastTokenUpdate'])
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'profilePic', 'balance', 'totalInvested', 'totalProfit', 'referralEarnings'])
           && isImmutable('role') && isImmutable('uid') 
           && isImmutable('email') && isImmutable('createdAt')
           && isImmutable('referralCode') && isImmutable('referredBy')

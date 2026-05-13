@@ -21,7 +21,7 @@ import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
 import { usePWA } from '../lib/PWAContext';
 import { IOSInstallGuide } from './IOSInstallGuide';
-import { requestNotificationPermission, onForegroundMessage } from '../lib/notifications';
+import { onForegroundMessage } from '../lib/notifications';
 import { toast } from 'sonner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -42,12 +42,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     // Check if we need to request permission/token
     const checkNotificationPermission = async () => {
-      try {
-        // Automatically request permission on mount if signed in
-        await requestNotificationPermission(user.uid);
-      } catch (err) {
-        console.error("Auto-notification request failed:", err);
-      }
     };
 
     checkNotificationPermission();
@@ -152,6 +146,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             )}
 
+
+
             <button 
               onClick={handleLogout}
               className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
@@ -171,6 +167,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className="text-xs font-black uppercase tracking-widest">Download App</span>
                </Button>
              )}
+
              <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>
                 <LogOut className="w-5 h-5 mr-3" />
                 <span className="text-xs font-black uppercase tracking-widest">Logout</span>

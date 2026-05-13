@@ -10,75 +10,50 @@ import { doc, setDoc, arrayUnion } from 'firebase/firestore';
 const VAPID_KEY = 'BAkQLF4_AddaRBbYyYlRIXK4RzVpKXruI8H4m7gYt-deu2crBG_8TjFpwrbkago89tcDfGkOl7tjsmvRGVNvs_c';
 
 export async function requestNotificationPermission(userId: string) {
-  if (!('Notification' in window)) {
-    throw new Error('This browser does not support notifications.');
+  const messaging = await getMessagingInstance();
+  if (!messaging) {
+    console.warn('Messaging is not supported on this browser.');
+    return null;
   }
 
-  // Check if we are in an iframe (AI Studio preview)
-  const isFramed = window.self !== window.top;
-
   try {
-    // 1. Request Permission IMMEDIATELY (must be direct result of user gesture)
-    let permission = Notification.permission;
-    
-    if (permission === 'default') {
-      try {
-        permission = await Notification.requestPermission();
-      } catch (err) {
-        permission = await new Promise((resolve) => {
-          Notification.requestPermission(resolve as any);
-        });
-      }
-    }
-
-    if (permission === 'denied') {
-      if (isFramed) {
-        throw new Error('Notification permission is blocked by the frame. Please click the "Open in new tab" button at the top right of this preview to enable alerts.');
-      }
-      throw new Error('Notification permission is BLOCKED. To fix this: 1. Click the "Lock/Controls" icon next to the URL. 2. Toggle "Notifications" to ON. 3. Reload the page.');
-    }
-
-    if (permission !== 'granted') {
-      return null;
-    }
-
-    // 2. Only after permission is granted, proceed with background work
-    const messaging = await getMessagingInstance();
-    if (!messaging) {
-      throw new Error('Push messaging is not supported on this browser or environment.');
-    }
-
-    // 3. Register Service Worker
+    // 1. Register Service Worker explicitly
     let registration;
     if ('serviceWorker' in navigator) {
       registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
         scope: '/'
       });
+      console.log('Service Worker registered:', registration.scope);
+      // Wait for it to be active
       await navigator.serviceWorker.ready;
-    } else {
-      throw new Error('Service Workers are not supported.');
     }
 
-    // 4. Get Token
-    const token = await getToken(messaging, { 
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: registration
-    });
+    // 2. Request Permission
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      // 3. Get Token
+      const token = await getToken(messaging, { 
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: registration
+      });
 
-    if (token) {
-      const userRef = doc(db, 'users', userId);
-      await setDoc(userRef, {
-        fcmTokens: arrayUnion(token),
-        lastTokenUpdate: new Date().toISOString()
-      }, { merge: true });
-      return token;
+      if (token) {
+        console.log('FCM Token Generated:', token);
+        // Store the token in the user's profile using setDoc merge to ensure it works even if doc doesn't exist
+        const userRef = doc(db, 'users', userId);
+        await setDoc(userRef, {
+          fcmTokens: arrayUnion(token),
+          lastTokenUpdate: new Date().toISOString()
+        }, { merge: true });
+        return token;
+      }
     } else {
-      throw new Error('Could not retrieve push token.');
+      console.warn('Notification permission denied by user.');
     }
-  } catch (error: any) {
-    console.error('Notification Error:', error);
-    throw error;
+  } catch (error) {
+    console.error('Error in requestNotificationPermission:', error);
   }
+  return null;
 }
 
 export async function onForegroundMessage() {
