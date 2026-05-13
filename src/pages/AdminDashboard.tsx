@@ -1128,10 +1128,13 @@ export default function AdminDashboard() {
                         if (!auth.currentUser) return;
                         const tId = toast.loading('Synchronizing device with GOLDBRICK Vault...');
                         requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) toast.success('Alerts enabled successfully!', { id: tId });
-                          else toast.error('Permission denied or Handshake timeout.', { id: tId });
-                        }).catch(() => {
-                           toast.error('Protocol failed. Please refresh and try again.', { id: tId });
+                          if (token) {
+                            toast.success('Alerts enabled successfully!', { id: tId });
+                          } else {
+                            toast.error('Handshake failed. No token received.', { id: tId });
+                          }
+                        }).catch((err: any) => {
+                           toast.error(err.message || 'Protocol failed. Please try again.', { id: tId });
                         });
                      }}
                   >

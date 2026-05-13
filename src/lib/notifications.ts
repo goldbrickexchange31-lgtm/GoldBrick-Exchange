@@ -12,8 +12,7 @@ const VAPID_KEY = 'BAkQLF4_AddaRBbYyYlRIXK4RzVpKXruI8H4m7gYt-deu2crBG_8TjFpwrbka
 export async function requestNotificationPermission(userId: string) {
   const messaging = await getMessagingInstance();
   if (!messaging) {
-    console.warn('Messaging is not supported on this browser.');
-    return null;
+    throw new Error('Push messaging is not supported on this browser or context (iframes are blocked).');
   }
 
   try {
@@ -26,10 +25,16 @@ export async function requestNotificationPermission(userId: string) {
       console.log('Service Worker registered:', registration.scope);
       // Wait for it to be active
       await navigator.serviceWorker.ready;
+    } else {
+      throw new Error('Service Workers are not supported in this browser.');
     }
 
     // 2. Request Permission
     const permission = await Notification.requestPermission();
+    if (permission === 'denied') {
+      throw new Error('Notification permission denied. Please reset permissions in your browser settings.');
+    }
+    
     if (permission === 'granted') {
       // 3. Get Token
       const token = await getToken(messaging, { 
@@ -46,12 +51,13 @@ export async function requestNotificationPermission(userId: string) {
           lastTokenUpdate: new Date().toISOString()
         }, { merge: true });
         return token;
+      } else {
+        throw new Error('Handshake failed: No token retrieved.');
       }
-    } else {
-      console.warn('Notification permission denied by user.');
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in requestNotificationPermission:', error);
+    throw error;
   }
   return null;
 }
