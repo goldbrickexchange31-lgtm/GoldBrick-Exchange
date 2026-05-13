@@ -48,7 +48,9 @@ import {
   Share2,
   ExternalLink,
   LogOut,
-  Bell
+  Bell,
+  Send,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { db, auth } from '../lib/firebase';
@@ -219,6 +221,32 @@ export default function AdminDashboard() {
       setIsReceiptOpen(false);
     } catch (e: any) {
       toast.error('Could not reject.');
+    }
+  };
+
+  const handleTestNotification = async () => {
+    if (!auth.currentUser) return;
+    const toastId = toast.loading('Dispatching GOLDBRICK signal...');
+    try {
+      const response = await fetch('/api/test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: auth.currentUser.uid,
+          title: 'GOLDBRICK MASTER ALERT',
+          body: 'System operational. Handshake successful. 🎖️'
+        })
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.success && data.successCount > 0) {
+        toast.success(`Success! Signal confirmed on ${data.successCount} devices.`, { id: toastId });
+      } else {
+        const errorMsg = data.error || (data.errorMessages && data.errorMessages[0]) || 'Signal failed. Ensure alerts are enabled.';
+        toast.error(`System Error: ${errorMsg}`, { id: toastId });
+      }
+    } catch (e) {
+      toast.error('Connection timeout.', { id: toastId });
     }
   };
 
@@ -1111,37 +1139,58 @@ export default function AdminDashboard() {
                </div>
 
                <div className="flex flex-col items-center gap-8">
-                  <div className="w-full max-w-sm p-6 bg-white/5 border border-border rounded-2xl mb-4 text-center">
-                    <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Notification Connectivity</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <div className={`size-3 rounded-full ${userData?.fcmTokens && userData.fcmTokens.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
-                      <span className="text-xs font-bold text-white uppercase italic">
-                        {userData?.fcmTokens?.length || 0} Registered Devices
-                      </span>
+                  <div className="w-full max-w-sm p-8 bg-white/5 border border-border rounded-[2rem] mb-6 text-center space-y-4">
+                    <div className="flex justify-center mb-2">
+                       <div className="p-4 rounded-3xl bg-primary/10 border border-primary/20">
+                          <Activity size={32} className="text-primary" />
+                       </div>
                     </div>
+                    <div>
+                       <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-widest">Network Status</p>
+                       <div className="flex items-center justify-center gap-2">
+                         <div className={`size-3 rounded-full ${userData?.fcmTokens && userData.fcmTokens.length > 0 ? 'bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.6)]' : 'bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]'} animate-pulse`} />
+                         <span className="text-xs font-black text-white uppercase italic tracking-tighter">
+                           {userData?.fcmTokens?.length || 0} ACTIVE SIGNAL NODES
+                         </span>
+                       </div>
+                    </div>
+                    
+                    <p className="text-[9px] text-slate-400 font-bold uppercase leading-relaxed opacity-60">
+                       Sync your device regularly to ensure you receive real-time deposit and message alerts from your investors.
+                    </p>
                   </div>
-
-                  <Button 
-                     variant="outline"
-                     className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
-                     onClick={() => {
-                        if (!auth.currentUser) return;
-                        const tId = toast.loading('Connecting GOLDBRICK Alert System...');
-                        requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) toast.success('GOLDBRICK Alerts Enabled!', { id: tId });
-                          else toast.error('Connection failed. Enable notifications in browser.', { id: tId });
-                        }).catch(() => {
-                           toast.error('System synchronization failed.', { id: tId });
-                        });
-                     }}
-                  >
-                     <Bell className="mr-2 size-4" /> Enable Admin Alerts
-                  </Button>
+ 
+                   <div className="w-full max-w-sm grid grid-cols-1 gap-4 mb-10">
+                      <Button 
+                         variant="outline"
+                         className="h-14 bg-white/5 border-primary text-primary font-black uppercase text-[10px] tracking-widest rounded-2xl hover:bg-primary hover:text-white transition-all shadow-xl shadow-primary/5"
+                         onClick={async () => {
+                            if (!auth.currentUser) return;
+                            const tId = toast.loading('Establishing secure GOLDBRICK link...');
+                            try {
+                               const token = await requestNotificationPermission(auth.currentUser.uid);
+                               if (token) toast.success('Signal Active! Device synchronized.', { id: tId });
+                               else toast.error('Handshake rejected. Allow notifications.', { id: tId });
+                            } catch (e) {
+                               toast.error('Protocol failure.', { id: tId });
+                            }
+                         }}
+                      >
+                         <Bell className="mr-2 size-4" /> Sync Admin Alerts
+                      </Button>
+ 
+                      <Button 
+                         className="h-14 bg-primary text-primary-foreground font-black uppercase text-[10px] tracking-widest rounded-2xl hover:scale-[1.02] transition-all shadow-xl shadow-primary/20"
+                         onClick={handleTestNotification}
+                      >
+                         <Send className="mr-2 size-4" /> Run Signal Test
+                      </Button>
+                   </div>
                   
-
-                  <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
-                     Save All Settings <Check className="ml-2 size-5" />
-                  </Button>
+ 
+                   <Button className="w-full max-w-sm h-16 bg-white text-black font-black uppercase text-sm rounded-3xl shadow-2xl hover:scale-[1.02] transition-all mb-12 border-none" onClick={handleUpdateConfig}>
+                      Commit All Configurations <Check className="ml-2 size-5" />
+                   </Button>
 
                   <Card className="w-full max-w-sm bg-red-500/5 border-red-500/20 rounded-3xl overflow-hidden border">
                     <CardHeader className="p-6 border-b border-red-500/10">

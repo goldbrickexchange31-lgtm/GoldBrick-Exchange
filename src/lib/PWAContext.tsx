@@ -14,8 +14,19 @@ const PWAContext = createContext<PWAContextType | undefined>(undefined);
 // Storing it outside the component to capture the event as early as possible
 let deferredPromptGlobal: any = null;
 
+// Catch the prompt as early as possible
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPromptGlobal = e;
+    // We can't easily trigger a state update here if the provider isn't rendered,
+    // but the provider will check deferredPromptGlobal on mount.
+    console.log('Captured beforeinstallprompt event globally');
+  });
+}
+
 // Initial check for iOS
-const isIOSDevice = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+const isIOSDevice = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [isInstallable, setIsInstallable] = useState(false);
@@ -30,20 +41,17 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener('beforeinstallprompt', handler);
 
-    // If it's iOS and not already in standalone mode, it's "installable"
-    if (isIOSDevice && !window.matchMedia('(display-mode: standalone)').matches) {
+    // Initial check: if we already captured it globally or if it's iOS
+    if (deferredPromptGlobal || isIOSDevice) {
       setIsInstallable(true);
     }
     
-    // Always consider it installable if not in standalone mode, 
-    // we will show a guide if beforeinstallprompt wasn't captured
+    // Always consider it installable if not in standalone mode to show the trigger
+    // This ensures we show the button and can give instructions if the prompt is missing
     if (!window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstallable(true);
-    }
-
-    // Check if app is already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-       setIsInstallable(false);
+    } else {
+      setIsInstallable(false);
     }
 
     return () => {
@@ -59,7 +67,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     if (!deferredPromptGlobal) {
       // Fallback: tell user how to install manually
-      toast.info('To install: click your browser menu and select "Install App" or "Add to Home Screen"');
+      toast.info('Installation: click your browser menu (⋮) and select "Install App" or "Add to Home Screen". Note: PWA install is disabled in Private/Incognito mode.', {
+        duration: 8000
+      });
       return;
     }
 

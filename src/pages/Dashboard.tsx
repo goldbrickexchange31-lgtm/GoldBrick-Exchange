@@ -17,8 +17,7 @@ import {
   TrendingDown,
   Activity,
   History,
-  Download,
-  Bell
+  Download
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
