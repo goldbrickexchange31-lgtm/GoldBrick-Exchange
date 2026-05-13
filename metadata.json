@@ -1,6 +1,6 @@
 {
   "name": "GoldBrick Exchange",
   "description": "Premium Gold Mining & Crypto Investment Platform",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["notifications"],
   "majorCapabilities": []
 }

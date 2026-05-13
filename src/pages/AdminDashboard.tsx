@@ -98,6 +98,7 @@ export default function AdminDashboard() {
     contactLink: '',
     depositInstruction: 'Send funds to the wallet below and upload a clear screenshot of your transaction receipt.',
   });
+  const [isEnablingAlerts, setIsEnablingAlerts] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -1123,16 +1124,24 @@ export default function AdminDashboard() {
 
                   <Button 
                      variant="outline"
+                     disabled={isEnablingAlerts}
                      className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/20 mb-4"
                      onClick={() => {
                         if (!auth.currentUser) return;
+                        setIsEnablingAlerts(true);
                         requestNotificationPermission(auth.currentUser.uid).then((token) => {
                           if (token) toast.success('Alerts enabled successfully!');
-                          else toast.error('Handshake failed.');
-                        }).catch((err) => toast.error(err.message));
+                          else toast.info('Handshake initiated. Alerts will activate soon.');
+                        }).catch((err) => {
+                          console.error(err);
+                          toast.error(err.message || 'Notification activation failed.');
+                        }).finally(() => {
+                          setIsEnablingAlerts(false);
+                        });
                      }}
                   >
-                     <ShieldAlert className="mr-2 size-4" /> Enable Admin Alerts
+                     <ShieldAlert className={`mr-2 size-4 ${isEnablingAlerts ? 'animate-spin' : ''}`} /> 
+                     {isEnablingAlerts ? 'Activating Protocol...' : 'Enable Admin Alerts'}
                   </Button>
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>

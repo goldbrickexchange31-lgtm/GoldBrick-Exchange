@@ -14,17 +14,17 @@ export async function requestNotificationPermission(userId: string) {
     throw new Error('This browser does not support notifications.');
   }
 
+  // Check if we are in an iframe (AI Studio preview)
+  const isFramed = window.self !== window.top;
+
   try {
     // 1. Request Permission IMMEDIATELY (must be direct result of user gesture)
-    // We check the permission first, but the actual requestPermission call
-    // MUST stay within the same call stack as the user click to avoid being blocked.
     let permission = Notification.permission;
     
     if (permission === 'default') {
       try {
         permission = await Notification.requestPermission();
       } catch (err) {
-        // Some older browsers use a callback instead of a promise
         permission = await new Promise((resolve) => {
           Notification.requestPermission(resolve as any);
         });
@@ -32,7 +32,10 @@ export async function requestNotificationPermission(userId: string) {
     }
 
     if (permission === 'denied') {
-      throw new Error('Notification permission is blocked. Tap the "Lock" icon in your browser address bar to reset permissions for this site.');
+      if (isFramed) {
+        throw new Error('Notification permission is blocked by the frame. Please click the "Open in new tab" button at the top right of this preview to enable alerts.');
+      }
+      throw new Error('Notification permission is BLOCKED. To fix this: 1. Click the "Lock/Controls" icon next to the URL. 2. Toggle "Notifications" to ON. 3. Reload the page.');
     }
 
     if (permission !== 'granted') {
