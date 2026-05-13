@@ -15,8 +15,7 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Download,
-  Bell
+  Download
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
