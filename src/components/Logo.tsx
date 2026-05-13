@@ -28,35 +28,37 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "h-12" }) =
           {/* Hexagon Frame / Shadow base */}
           <path
             d="M50 0 L93.3 25 V75 L50 100 L6.7 75 V25 Z"
-            fill="#000000"
-            opacity="0.2"
+            fill="#1E3A8A"
+            opacity="0.1"
           />
           
-          {/* Main Hexagon Body (Dark/Black) */}
+          {/* Main Hexagon Body */}
           <path
             d="M50 2 L91.3 26 V74 L50 98 L8.7 74 V26 Z"
-            fill="#030712"
+            fill="url(#blue-primary)"
           />
 
           {/* Simple Bold 'G' Icon */}
           <text
             x="50"
-            y="58"
+            y="62"
             fontFamily="ui-sans-serif, system-ui, sans-serif"
-            fontSize="54"
+            fontSize="64"
             fontWeight="900"
             fill="white"
+            opacity="0.9"
             textAnchor="middle"
             dominantBaseline="middle"
+            className="tracking-tighter"
           >
             G
           </text>
           
-          {/* Subtle Bevel highlight for depth */}
+          {/* Front Bevel highlight for depth */}
           <path
             d="M50 2 L91.3 26 V30 L50 6 L8.7 30 V26 Z"
-            fill="white"
-            opacity="0.1"
+            fill="url(#blue-highlight)"
+            opacity="0.3"
           />
         </g>
       </svg>
@@ -68,7 +70,7 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "h-12" }) =
         <div className="flex items-center gap-2 mt-1 px-1">
           <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
           <span className="text-[10px] font-bold text-primary tracking-[0.5em] uppercase leading-none">
-            INVESTMENTS
+            EXCHANGE
           </span>
           <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
         </div>
