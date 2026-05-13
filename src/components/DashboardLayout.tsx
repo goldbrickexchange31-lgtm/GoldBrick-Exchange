@@ -1,5 +1,5 @@
 import { Logo } from './Logo';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
@@ -21,37 +21,13 @@ import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
 import { usePWA } from '../lib/PWAContext';
 import { IOSInstallGuide } from './IOSInstallGuide';
-import { onForegroundMessage } from '../lib/notifications';
-import { toast } from 'sonner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  const { userData, user } = useAuth();
+  const { userData } = useAuth();
   const navigate = useNavigate();
   const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
-
-  useEffect(() => {
-    if (!user) return;
-    
-    // Subscribe to foreground messages
-    let unsubscribe: any;
-    onForegroundMessage().then(unsub => {
-      unsubscribe = unsub;
-    });
-    
-    // Check if we need to request permission/token
-    const checkNotificationPermission = async () => {
-    };
-
-    checkNotificationPermission();
-    
-    return () => {
-      if (typeof unsubscribe === 'function') {
-        unsubscribe();
-      }
-    };
-  }, [user]);
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -146,8 +122,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             )}
 
-
-
             <button 
               onClick={handleLogout}
               className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
@@ -167,7 +141,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className="text-xs font-black uppercase tracking-widest">Download App</span>
                </Button>
              )}
-
              <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>
                 <LogOut className="w-5 h-5 mr-3" />
                 <span className="text-xs font-black uppercase tracking-widest">Logout</span>

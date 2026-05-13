@@ -4,6 +4,7 @@
  */
 
 // Import and configure the Firebase SDK
+// These scripts are made available when the app is served locally
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-messaging-compat.js');
 
@@ -22,10 +23,10 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  const notificationTitle = payload.notification.title || 'New Notification';
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: payload.notification.icon || '/og-image.png',
+    icon: payload.notification.icon || '/logo.png', // Fallback to a default icon
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
@@ -35,6 +36,7 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
+  // Try to find a window and focus it, or open a new one
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
@@ -49,32 +51,5 @@ self.addEventListener('notificationclick', (event) => {
         }
         return clients.openWindow('/');
       })
-  );
-});
-
-// Generic PWA Caching
-const CACHE_NAME = 'goldbrick-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  // Let Firebase capture its own requests
-  if (event.request.url.includes('firebaselogging.googleapis.com')) return;
-  
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
   );
 });

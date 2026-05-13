@@ -47,7 +47,8 @@ import {
   History,
   Share2,
   ExternalLink,
-  LogOut
+  LogOut,
+  Send
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { db, auth } from '../lib/firebase';
@@ -159,9 +160,7 @@ export default function AdminDashboard() {
     try {
       if (auth.currentUser) {
         requestNotificationPermission(auth.currentUser.uid).catch(console.error);
-        onForegroundMessage().then(unsub => {
-          unsubscribeForeground = unsub;
-        });
+        unsubscribeForeground = onForegroundMessage();
       }
     } catch (e) {
       console.error("Notification setup failed", e);
@@ -466,6 +465,33 @@ export default function AdminDashboard() {
     const mainContent = document.querySelector('.overflow-y-auto');
     if (mainContent) mainContent.scrollTo(0, 0);
   }, [activeSection]);
+
+  const handleTestNotification = async () => {
+    if (!auth.currentUser) return;
+    const toastId = toast.loading('Establishing secure notification link...');
+    try {
+      const response = await fetch('/api/test-notification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: auth.currentUser.uid,
+          title: 'GOLDBRICK MASTER ALERT',
+          body: 'Pixel-perfect push notification system is online and active! 🎖️'
+        })
+      });
+      
+      const data = await response.json();
+      if (response.ok && data.success && data.successCount > 0) {
+        toast.success(`Success! Handshake confirmed on ${data.successCount} devices.`, { id: toastId });
+      } else {
+        const errorMsg = data.error || (data.errorMessages && data.errorMessages[0]) || 'Handshake failed. No active tokens found.';
+        toast.error(`Protocol Error: ${errorMsg}`, { id: toastId });
+        console.error('Server notification error:', data);
+      }
+    } catch (e) {
+      toast.error('System Connectivity Error: Link failed.', { id: toastId });
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -1137,7 +1163,13 @@ export default function AdminDashboard() {
                      <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
                   </Button>
                   
-
+                  <Button 
+                     variant="outline"
+                     className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all mb-4"
+                     onClick={handleTestNotification}
+                  >
+                     <Send className="mr-2 size-4" /> Send Test Notification
+                  </Button>
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
                      Save All Settings <Check className="ml-2 size-5" />

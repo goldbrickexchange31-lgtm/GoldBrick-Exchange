@@ -216,7 +216,6 @@ export default function Dashboard() {
                  <Download className="size-4 mr-2" /> Install App
                </Button>
              )}
-
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>
