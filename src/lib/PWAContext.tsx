@@ -1,5 +1,5 @@
+// src/lib/PWAContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { toast } from 'sonner';
 
 interface PWAContextType {
   isInstallable: boolean;
@@ -11,17 +11,16 @@ interface PWAContextType {
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
 
-// Storing it outside the component to capture the event as early as possible
-let deferredPromptGlobal: any = null;
+// Storage for the browser's install prompt event
+let deferredPrompt: any = null;
 
-// Catch the prompt as early as possible
+// Catch the prompt event as early as possible
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
-    deferredPromptGlobal = e;
-    // We can't easily trigger a state update here if the provider isn't rendered,
-    // but the provider will check deferredPromptGlobal on mount.
-    console.log('Captured beforeinstallprompt event globally');
+    deferredPrompt = e;
+    // Dispatch a custom event so the hook can react
+    window.dispatchEvent(new CustomEvent('pwa-install-ready'));
   });
 }
 
@@ -33,54 +32,55 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
-      deferredPromptGlobal = e;
+    const checkInstallability = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      
+      // If we have the prompt OR it's iOS and not already installed, show install option
+      if ((deferredPrompt || isIOSDevice) && !isStandalone) {
+        setIsInstallable(true);
+      } else if (!isStandalone) {
+        // Fallback: Show button even if prompt was missed, clicking will handle it
+        setIsInstallable(true);
+      } else {
+        setIsInstallable(false);
+      }
+    };
+
+    const onInstallReady = () => {
       setIsInstallable(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
-
-    // Initial check: if we already captured it globally or if it's iOS
-    if (deferredPromptGlobal || isIOSDevice) {
-      setIsInstallable(true);
-    }
+    window.addEventListener('pwa-install-ready', onInstallReady);
+    window.addEventListener('appinstalled', () => setIsInstallable(false));
     
-    // Always consider it installable if not in standalone mode to show the trigger
-    // This ensures we show the button and can give instructions if the prompt is missing
-    if (!window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstallable(true);
-    } else {
-      setIsInstallable(false);
-    }
+    checkInstallability();
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('pwa-install-ready', onInstallReady);
     };
   }, []);
 
   const handleInstallClick = async () => {
+    // 1. Handle iOS
     if (isIOSDevice) {
       setShowIOSInstructions(true);
       return;
     }
 
-    if (!deferredPromptGlobal) {
-      // Fallback: tell user how to install manually
-      toast.info('Installation: click your browser menu (⋮) and select "Install App" or "Add to Home Screen". Note: PWA install is disabled in Private/Incognito mode.', {
-        duration: 8000
-      });
+    // 2. Handle prompt available
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsInstallable(false);
+        deferredPrompt = null;
+      }
       return;
     }
-
-    deferredPromptGlobal.prompt();
-    const { outcome } = await deferredPromptGlobal.userChoice;
     
-    if (outcome === 'accepted') {
-      setIsInstallable(false);
-    }
-
-    deferredPromptGlobal = null;
+    // 3. Fallback: No prompt captured yet
+    // User hates instructions/toasts, so we just log and do nothing or rely on browser behavior
+    console.log('PWA Prompt not captured yet. Browser may trigger automatically or via menu.');
   };
 
   return (
@@ -103,3 +103,4 @@ export function usePWA() {
   }
   return context;
 }
+
