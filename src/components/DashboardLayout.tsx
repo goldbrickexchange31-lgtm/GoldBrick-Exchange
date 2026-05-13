@@ -14,16 +14,19 @@ import {
   X, 
   LayoutDashboard,
   LogOut,
-  Settings
+  Settings,
+  Download
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const { userData } = useAuth();
   const navigate = useNavigate();
+  const { isInstallable, handleInstallClick } = usePWAInstall();
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -104,6 +107,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             )}
 
+            {isInstallable && (
+              <button 
+                onClick={handleInstallClick}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-primary font-black animate-pulse hover:bg-primary/10 transition-all border border-primary/20"
+              >
+                <Download className="w-5 h-5" />
+                <span className="text-xs uppercase tracking-widest">Download App</span>
+              </button>
+            )}
+
             <button 
               onClick={handleLogout}
               className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
@@ -113,7 +126,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
           </nav>
 
-          <div className="p-4 border-t border-border hidden md:block">
+          <div className="p-4 border-t border-border hidden md:block space-y-2">
+             {isInstallable && (
+               <Button 
+                 onClick={handleInstallClick}
+                 className="w-full justify-start bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all rounded-xl animate-pulse"
+               >
+                  <Download className="w-5 h-5 mr-3" />
+                  <span className="text-xs font-black uppercase tracking-widest">Download App</span>
+               </Button>
+             )}
              <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>
                 <LogOut className="w-5 h-5 mr-3" />
                 <span className="text-xs font-black uppercase tracking-widest">Logout</span>
