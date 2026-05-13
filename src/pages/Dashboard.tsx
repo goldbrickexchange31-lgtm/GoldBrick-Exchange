@@ -16,13 +16,11 @@ import {
   ChevronRight,
   TrendingDown,
   Activity,
-  History,
-  Download
+  History
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
 import { useAuth } from '../lib/AuthContext';
-import { usePWA } from '../lib/PWAContext';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -42,11 +40,9 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { IOSInstallGuide } from '../components/IOSInstallGuide';
 
 export default function Dashboard() {
   const { user, userData } = useAuth();
-  const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
   const [allInvestments, setAllInvestments] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [globalActivity, setGlobalActivity] = useState<any[]>([]);
@@ -195,10 +191,6 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <IOSInstallGuide 
-        isOpen={showIOSInstructions} 
-        onClose={() => setShowIOSInstructions(false)} 
-      />
       <div className="space-y-10 pb-12">
         {/* Top Header Section */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -207,15 +199,6 @@ export default function Dashboard() {
              <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold">Welcome Back: {userData?.displayName?.toUpperCase()}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-             {isInstallable && (
-               <Button 
-                 onClick={handleInstallClick}
-                 variant="outline" 
-                 className="flex-1 md:flex-none border-primary/20 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse"
-               >
-                 <Download className="size-4 mr-2" /> Install App
-               </Button>
-             )}
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>
