@@ -42,9 +42,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     // Check if we need to request permission/token
     const checkNotificationPermission = async () => {
-      // If permission is already granted, we should still ensure the token is registered
-      if (Notification.permission === 'granted') {
+      try {
+        // Automatically request permission on mount if signed in
         await requestNotificationPermission(user.uid);
+      } catch (err) {
+        console.error("Auto-notification request failed:", err);
       }
     };
 

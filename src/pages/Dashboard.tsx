@@ -23,7 +23,6 @@ import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
 import { useAuth } from '../lib/AuthContext';
 import { usePWA } from '../lib/PWAContext';
-import { requestNotificationPermission } from '../lib/notifications';
 import { db } from '../lib/firebase';
 import { 
   collection, 

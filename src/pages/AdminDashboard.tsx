@@ -98,7 +98,6 @@ export default function AdminDashboard() {
     contactLink: '',
     depositInstruction: 'Send funds to the wallet below and upload a clear screenshot of your transaction receipt.',
   });
-  const [isEnablingAlerts, setIsEnablingAlerts] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -158,16 +157,23 @@ export default function AdminDashboard() {
 
     // Notification Setup
     let unsubscribeForeground: () => void = () => {};
-    try {
-      if (auth.currentUser) {
-        requestNotificationPermission(auth.currentUser.uid).catch(console.error);
-        onForegroundMessage().then(unsub => {
-          unsubscribeForeground = unsub;
-        });
+    const setupNotifications = async () => {
+      if (!auth.currentUser) return;
+      try {
+        // Auto-request permission on mount
+        const token = await requestNotificationPermission(auth.currentUser.uid);
+        if (token) {
+          console.log('FCM Token activated automatically');
+        }
+        
+        const unsub = await onForegroundMessage();
+        unsubscribeForeground = unsub;
+      } catch (e) {
+        console.error("Notification setup failed", e);
       }
-    } catch (e) {
-      console.error("Notification setup failed", e);
-    }
+    };
+
+    setupNotifications();
 
     setLoading(false);
     return () => {
@@ -1112,41 +1118,9 @@ export default function AdminDashboard() {
                </div>
 
                <div className="flex flex-col items-center gap-8">
-                  <div className="w-full max-w-sm p-6 bg-white/5 border border-border rounded-2xl mb-4 text-center">
-                    <p className="text-[10px] font-black uppercase text-slate-400 mb-2">Notification Connectivity</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <div className={`size-3 rounded-full ${userData?.fcmTokens && userData.fcmTokens.length > 0 ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]' : 'bg-red-500'}`} />
-                      <span className="text-xs font-bold text-white uppercase italic">
-                        {userData?.fcmTokens?.length || 0} Registered Devices
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button 
-                     variant="outline"
-                     disabled={isEnablingAlerts}
-                     className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/20 mb-4"
-                     onClick={() => {
-                        if (!auth.currentUser) return;
-                        setIsEnablingAlerts(true);
-                        requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) toast.success('Alerts enabled successfully!');
-                          else toast.info('Handshake initiated. Alerts will activate soon.');
-                        }).catch((err) => {
-                          console.error(err);
-                          toast.error(err.message || 'Notification activation failed.');
-                        }).finally(() => {
-                          setIsEnablingAlerts(false);
-                        });
-                     }}
-                  >
-                     <ShieldAlert className={`mr-2 size-4 ${isEnablingAlerts ? 'animate-spin' : ''}`} /> 
-                     {isEnablingAlerts ? 'Activating Protocol...' : 'Enable Admin Alerts'}
-                  </Button>
-                  
-                  <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
-                     Save All Settings <Check className="ml-2 size-5" />
-                  </Button>
+                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
+                      Save All Settings <Check className="ml-2 size-5" />
+                   </Button>
 
                   <Card className="w-full max-w-sm bg-red-500/5 border-red-500/20 rounded-3xl overflow-hidden border">
                     <CardHeader className="p-6 border-b border-red-500/10">
