@@ -207,15 +207,6 @@ export default function Dashboard() {
              <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold">Welcome Back: {userData?.displayName?.toUpperCase()}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-             {isInstallable && (
-               <Button 
-                 onClick={handleInstallClick}
-                 variant="outline" 
-                 className="flex-1 md:flex-none border-primary/20 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse"
-               >
-                 <Download className="size-4 mr-2" /> Install App
-               </Button>
-             )}
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>

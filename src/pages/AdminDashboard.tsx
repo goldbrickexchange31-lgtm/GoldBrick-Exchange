@@ -1134,6 +1134,28 @@ export default function AdminDashboard() {
                                onChange={(e) => setConfig({...config, depositInstruction: e.target.value})}
                             />
                          </div>
+
+                         <div className="pt-6 border-t border-border space-y-4">
+                            <Label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Platform Controls</Label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                               <Button 
+                                 type="button"
+                                 variant="outline" 
+                                 className={`h-12 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all ${config.pwaEnabled !== false ? 'border-primary text-primary' : 'border-border text-white/40'}`}
+                                 onClick={() => setConfig({...config, pwaEnabled: config.pwaEnabled === false ? true : false})}
+                               >
+                                 {config.pwaEnabled !== false ? 'PWA: Operational' : 'PWA: Disabled'}
+                               </Button>
+                               <Button 
+                                 type="button"
+                                 variant="outline" 
+                                 className={`h-12 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all ${config.notificationsActive !== false ? 'border-primary text-primary' : 'border-border text-white/40'}`}
+                                 onClick={() => setConfig({...config, notificationsActive: config.notificationsActive === false ? true : false})}
+                               >
+                                 {config.notificationsActive !== false ? 'Alerts: Active' : 'Alerts: Paused'}
+                               </Button>
+                            </div>
+                         </div>
                       </CardContent>
                   </Card>
                </div>

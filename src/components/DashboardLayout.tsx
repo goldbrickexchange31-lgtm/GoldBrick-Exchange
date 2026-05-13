@@ -81,12 +81,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Mobile Top Header */}
       <header className="md:hidden flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-50">
-        <Link to="/dashboard">
+        <Link to="/dashboard" className="flex items-center gap-2">
           <Logo className="h-8" />
         </Link>
-        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white">
-          {isSidebarOpen ? <X /> : <Menu />}
-        </Button>
+        <div className="flex items-center gap-2">
+          {isInstallable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleInstallClick}
+              className="h-8 border-primary/40 bg-primary/10 text-primary font-black uppercase text-[9px] tracking-widest px-3 rounded-lg animate-pulse"
+            >
+              <Download className="size-3 mr-1" /> Install
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white h-8 w-8">
+            {isSidebarOpen ? <X /> : <Menu />}
+          </Button>
+        </div>
       </header>
 
       {/* Sidebar for Desktop & Mobile Overlay */}
@@ -130,16 +142,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             )}
 
-            {isInstallable && (
-              <button 
-                onClick={handleInstallClick}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-primary font-black animate-pulse hover:bg-primary/10 transition-all border border-primary/20"
-              >
-                <Download className="w-5 h-5" />
-                <span className="text-xs uppercase tracking-widest">Download App</span>
-              </button>
-            )}
-
             <button 
               onClick={handleLogout}
               className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
@@ -150,15 +152,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           <div className="p-4 border-t border-border hidden md:block space-y-2">
-             {isInstallable && (
-               <Button 
-                 onClick={handleInstallClick}
-                 className="w-full justify-start bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 transition-all rounded-xl animate-pulse"
-               >
-                  <Download className="w-5 h-5 mr-3" />
-                  <span className="text-xs font-black uppercase tracking-widest">Download App</span>
-               </Button>
-             )}
              <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>
                 <LogOut className="w-5 h-5 mr-3" />
                 <span className="text-xs font-black uppercase tracking-widest">Logout</span>
@@ -169,6 +162,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto no-scrollbar">
+        {/* Desktop Header */}
+        <header className="hidden md:flex items-center justify-between p-6 border-b border-border bg-background sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+             <p className="text-[10px] font-black uppercase text-white/20 tracking-[0.2em] italic">GoldBrick Protocol v2.4</p>
+          </div>
+          <div className="flex items-center gap-4">
+            {isInstallable && (
+              <Button 
+                onClick={handleInstallClick}
+                variant="outline"
+                className="h-10 border-primary/40 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse shadow-lg shadow-primary/5"
+              >
+                <Download className="size-4 mr-2" /> Download App
+              </Button>
+            )}
+            <div className="flex items-center gap-3 p-1.5 bg-white/5 border border-border rounded-2xl">
+              <div className="size-8 rounded-xl bg-primary flex items-center justify-center font-black italic text-xs text-white">
+                {userData?.displayName?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="pr-3">
+                <p className="text-[9px] font-black uppercase text-white/40 leading-none mb-1">Authenticated</p>
+                <p className="text-[10px] font-black text-white italic leading-none">{userData?.displayName?.split(' ')[0]}</p>
+              </div>
+            </div>
+          </div>
+        </header>
         <div className="max-w-6xl mx-auto p-4 md:p-8">
           {children}
         </div>

@@ -69,18 +69,27 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     // 2. Handle prompt available
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setIsInstallable(false);
-        deferredPrompt = null;
+      try {
+        const promptEvent = deferredPrompt;
+        // The prompt() method must be called within a user gesture.
+        promptEvent.prompt();
+        
+        const { outcome } = await promptEvent.userChoice;
+        console.log('User PWA install choice:', outcome);
+        
+        if (outcome === 'accepted') {
+          setIsInstallable(false);
+          deferredPrompt = null;
+        }
+      } catch (err) {
+        console.error('Error triggering PWA prompt:', err);
       }
       return;
     }
     
-    // 3. Fallback: No prompt captured yet
-    // User hates instructions/toasts, so we just log and do nothing or rely on browser behavior
-    console.log('PWA Prompt not captured yet. Browser may trigger automatically or via menu.');
+    // 3. Fallback: No prompt captured
+    // In some browsers, we can try to trigger it via hidden link or just let the user know
+    console.log('PWA Prompt not available yet.');
   };
 
   return (
