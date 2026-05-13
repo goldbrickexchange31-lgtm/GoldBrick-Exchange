@@ -1,5 +1,5 @@
 import { Logo } from './Logo';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { 
@@ -15,19 +15,58 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
-  Download
+  Download,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
 import { usePWA } from '../lib/PWAContext';
 import { IOSInstallGuide } from './IOSInstallGuide';
+import { requestNotificationPermission, onForegroundMessage } from '../lib/notifications';
+import { toast } from 'sonner';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  const { userData } = useAuth();
+  const { userData, user } = useAuth();
   const navigate = useNavigate();
   const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
+
+  useEffect(() => {
+    if (!user) return;
+    
+    // Subscribe to foreground messages
+    let unsubscribe: any;
+    onForegroundMessage().then(unsub => {
+      unsubscribe = unsub;
+    });
+    
+    // Check if we need to request permission/token
+    const checkNotificationPermission = async () => {
+      // If permission is already granted, we should still ensure the token is registered
+      if (Notification.permission === 'granted') {
+        await requestNotificationPermission(user.uid);
+      }
+    };
+
+    checkNotificationPermission();
+    
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, [user]);
+
+  const handleEnableNotifications = async () => {
+    if (!user) return;
+    const token = await requestNotificationPermission(user.uid);
+    if (token) {
+      toast.success('Notifications enabled successfully!');
+    } else {
+      toast.error('Could not enable notifications. Please check your browser settings.');
+    }
+  };
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -122,6 +161,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             )}
 
+            {userData && Notification.permission !== 'granted' && (
+              <button 
+                onClick={handleEnableNotifications}
+                className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-blue-400 font-black hover:bg-blue-400/10 transition-all border border-blue-400/20"
+              >
+                <Bell className="w-5 h-5" />
+                <span className="text-xs uppercase tracking-widest">Enable Alerts</span>
+              </button>
+            )}
+
             <button 
               onClick={handleLogout}
               className="md:hidden flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/40 hover:bg-red-500/10 hover:text-red-500 transition-colors"
@@ -139,6 +188,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                >
                   <Download className="w-5 h-5 mr-3" />
                   <span className="text-xs font-black uppercase tracking-widest">Download App</span>
+               </Button>
+             )}
+             {userData && Notification.permission !== 'granted' && (
+               <Button 
+                 onClick={handleEnableNotifications}
+                 className="w-full justify-start bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-all rounded-xl"
+               >
+                  <Bell className="w-5 h-5 mr-3" />
+                  <span className="text-xs font-black uppercase tracking-widest">Enable Alerts</span>
                </Button>
              )}
              <Button variant="ghost" className="w-full justify-start text-white/40 hover:text-red-500 hover:bg-red-500/10 transition-all rounded-xl" onClick={handleLogout}>

@@ -160,7 +160,9 @@ export default function AdminDashboard() {
     try {
       if (auth.currentUser) {
         requestNotificationPermission(auth.currentUser.uid).catch(console.error);
-        unsubscribeForeground = onForegroundMessage();
+        onForegroundMessage().then(unsub => {
+          unsubscribeForeground = unsub;
+        });
       }
     } catch (e) {
       console.error("Notification setup failed", e);
