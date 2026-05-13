@@ -16,13 +16,23 @@ export async function requestNotificationPermission(userId: string) {
 
   try {
     // 1. Request Permission IMMEDIATELY (must be direct result of user gesture)
+    // We check the permission first, but the actual requestPermission call
+    // MUST stay within the same call stack as the user click to avoid being blocked.
     let permission = Notification.permission;
+    
     if (permission === 'default') {
-      permission = await Notification.requestPermission();
+      try {
+        permission = await Notification.requestPermission();
+      } catch (err) {
+        // Some older browsers use a callback instead of a promise
+        permission = await new Promise((resolve) => {
+          Notification.requestPermission(resolve as any);
+        });
+      }
     }
 
     if (permission === 'denied') {
-      throw new Error('Notification permission denied. If you are in Incognito/Private mode, please switch to a normal tab. Otherwise, reset permissions in your browser settings.');
+      throw new Error('Notification permission is blocked. Tap the "Lock" icon in your browser address bar to reset permissions for this site.');
     }
 
     if (permission !== 'granted') {

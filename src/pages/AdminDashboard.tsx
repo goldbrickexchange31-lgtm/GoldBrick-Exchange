@@ -1126,16 +1126,10 @@ export default function AdminDashboard() {
                      className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/20 mb-4"
                      onClick={() => {
                         if (!auth.currentUser) return;
-                        const tId = toast.loading('Synchronizing device with GOLDBRICK Vault...');
                         requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) {
-                            toast.success('Alerts enabled successfully!', { id: tId });
-                          } else {
-                            toast.error('Handshake failed. No token received.', { id: tId });
-                          }
-                        }).catch((err: any) => {
-                           toast.error(err.message || 'Protocol failed. Please try again.', { id: tId });
-                        });
+                          if (token) toast.success('Alerts enabled successfully!');
+                          else toast.error('Handshake failed.');
+                        }).catch((err) => toast.error(err.message));
                      }}
                   >
                      <ShieldAlert className="mr-2 size-4" /> Enable Admin Alerts
