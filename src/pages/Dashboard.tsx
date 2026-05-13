@@ -17,8 +17,7 @@ import {
   TrendingDown,
   Activity,
   History,
-  Download,
-  Bell
+  Download
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
@@ -195,16 +194,6 @@ export default function Dashboard() {
     return realized + unrealized;
   }, [userData, allInvestments]);
 
-  const handleEnableNotifications = async () => {
-    if (!user) return;
-    const token = await requestNotificationPermission(user.uid);
-    if (token) {
-      toast.success('Notifications enabled successfully!');
-    } else {
-      toast.error('Could not enable notifications. Please check your browser settings.');
-    }
-  };
-
   return (
     <DashboardLayout>
       <IOSInstallGuide 
@@ -226,15 +215,6 @@ export default function Dashboard() {
                  className="flex-1 md:flex-none border-primary/20 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse"
                >
                  <Download className="size-4 mr-2" /> Install App
-               </Button>
-             )}
-             {userData && Notification.permission !== 'granted' && (
-               <Button 
-                 onClick={handleEnableNotifications}
-                 variant="outline" 
-                 className="flex-1 md:flex-none border-blue-500/20 bg-blue-500/5 text-blue-400 font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-blue-500/10 transition-all shadow-lg shadow-blue-500/5"
-               >
-                 <Bell className="size-4 mr-2" /> Enable Alerts
                </Button>
              )}
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">

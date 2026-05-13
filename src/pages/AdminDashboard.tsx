@@ -468,33 +468,6 @@ export default function AdminDashboard() {
     if (mainContent) mainContent.scrollTo(0, 0);
   }, [activeSection]);
 
-  const handleTestNotification = async () => {
-    if (!auth.currentUser) return;
-    const toastId = toast.loading('Establishing secure notification link...');
-    try {
-      const response = await fetch('/api/test-notification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: auth.currentUser.uid,
-          title: 'GOLDBRICK MASTER ALERT',
-          body: 'Pixel-perfect push notification system is online and active! 🎖️'
-        })
-      });
-      
-      const data = await response.json();
-      if (response.ok && data.success && data.successCount > 0) {
-        toast.success(`Success! Handshake confirmed on ${data.successCount} devices.`, { id: toastId });
-      } else {
-        const errorMsg = data.error || (data.errorMessages && data.errorMessages[0]) || 'Handshake failed. No active tokens found.';
-        toast.error(`Protocol Error: ${errorMsg}`, { id: toastId });
-        console.error('Server notification error:', data);
-      }
-    } catch (e) {
-      toast.error('System Connectivity Error: Link failed.', { id: toastId });
-    }
-  };
-
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -1150,27 +1123,19 @@ export default function AdminDashboard() {
 
                   <Button 
                      variant="outline"
-                     className="w-full max-w-sm h-14 bg-white/5 border-primary/20 text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary/5 transition-all mb-4"
+                     className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/20 mb-4"
                      onClick={() => {
                         if (!auth.currentUser) return;
                         const tId = toast.loading('Synchronizing device with GOLDBRICK Vault...');
                         requestNotificationPermission(auth.currentUser.uid).then((token) => {
-                          if (token) toast.success('Active link established on this device!', { id: tId });
+                          if (token) toast.success('Alerts enabled successfully!', { id: tId });
                           else toast.error('Permission denied or Handshake timeout.', { id: tId });
                         }).catch(() => {
                            toast.error('Protocol failed. Please refresh and try again.', { id: tId });
                         });
                      }}
                   >
-                     <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
-                  </Button>
-                  
-                  <Button 
-                     variant="outline"
-                     className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all mb-4"
-                     onClick={handleTestNotification}
-                  >
-                     <Send className="mr-2 size-4" /> Send Test Notification
+                     <ShieldAlert className="mr-2 size-4" /> Enable Admin Alerts
                   </Button>
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
