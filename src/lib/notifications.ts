@@ -4,13 +4,17 @@
  */
 
 import { getToken, onMessage } from 'firebase/messaging';
-import { messaging, db } from './firebase';
+import { getMessagingInstance, db } from './firebase';
 import { doc, setDoc, arrayUnion } from 'firebase/firestore';
 
 const VAPID_KEY = 'BAkQLF4_AddaRBbYyYlRIXK4RzVpKXruI8H4m7gYt-deu2crBG_8TjFpwrbkago89tcDfGkOl7tjsmvRGVNvs_c';
 
 export async function requestNotificationPermission(userId: string) {
-  if (!messaging) return null;
+  const messaging = await getMessagingInstance();
+  if (!messaging) {
+    console.warn('Messaging is not supported on this browser.');
+    return null;
+  }
 
   try {
     // 1. Register Service Worker explicitly
@@ -52,7 +56,8 @@ export async function requestNotificationPermission(userId: string) {
   return null;
 }
 
-export function onForegroundMessage() {
+export async function onForegroundMessage() {
+  const messaging = await getMessagingInstance();
   if (!messaging) return () => {};
 
   return onMessage(messaging, (payload) => {

@@ -160,7 +160,9 @@ export default function AdminDashboard() {
     try {
       if (auth.currentUser) {
         requestNotificationPermission(auth.currentUser.uid).catch(console.error);
-        unsubscribeForeground = onForegroundMessage();
+        onForegroundMessage().then(unsub => {
+          unsubscribeForeground = unsub;
+        });
       }
     } catch (e) {
       console.error("Notification setup failed", e);
@@ -1163,13 +1165,15 @@ export default function AdminDashboard() {
                      <ShieldAlert className="mr-2 size-4" /> Sync Push Notifications
                   </Button>
                   
-                  <Button 
+
+                   <Button 
                      variant="outline"
                      className="w-full max-w-sm h-14 bg-primary/10 border-primary text-primary font-black uppercase text-xs rounded-2xl hover:bg-primary hover:text-white transition-all mb-4"
                      onClick={handleTestNotification}
                   >
                      <Send className="mr-2 size-4" /> Send Test Notification
                   </Button>
+                  
                   
                   <Button className="w-full max-w-sm h-16 bg-primary text-primary-foreground font-black uppercase text-sm rounded-3xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all" onClick={handleUpdateConfig}>
                      Save All Settings <Check className="ml-2 size-5" />

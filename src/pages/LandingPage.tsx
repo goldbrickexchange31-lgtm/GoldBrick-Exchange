@@ -5,13 +5,18 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Trophy, ShieldCheck, Zap, Users, ArrowRight, Star, Download } from 'lucide-react';
-import { usePWAInstall } from '../hooks/usePWAInstall';
+import { usePWA } from '../lib/PWAContext';
+import { IOSInstallGuide } from '../components/IOSInstallGuide';
 
 export default function LandingPage() {
-  const { isInstallable, handleInstallClick } = usePWAInstall();
+  const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-hidden">
+      <IOSInstallGuide 
+        isOpen={showIOSInstructions} 
+        onClose={() => setShowIOSInstructions(false)} 
+      />
       {/* Navbar */}
       <nav className="flex items-center justify-between p-6 max-w-7xl mx-auto border-b border-border">
         <Link to="/">

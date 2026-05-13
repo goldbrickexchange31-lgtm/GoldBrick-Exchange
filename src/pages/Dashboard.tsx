@@ -16,11 +16,15 @@ import {
   ChevronRight,
   TrendingDown,
   Activity,
-  History
+  History,
+  Download,
+  Bell
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
 import { useAuth } from '../lib/AuthContext';
+import { usePWA } from '../lib/PWAContext';
+import { requestNotificationPermission } from '../lib/notifications';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -40,9 +44,11 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { IOSInstallGuide } from '../components/IOSInstallGuide';
 
 export default function Dashboard() {
   const { user, userData } = useAuth();
+  const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
   const [allInvestments, setAllInvestments] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [globalActivity, setGlobalActivity] = useState<any[]>([]);
@@ -189,8 +195,27 @@ export default function Dashboard() {
     return realized + unrealized;
   }, [userData, allInvestments]);
 
+  const handleEnableNotifications = async () => {
+    if (!user) return;
+    const toastId = toast.loading('Connecting to GOLDBRICK Alert System...');
+    try {
+      const token = await requestNotificationPermission(user.uid);
+      if (token) {
+        toast.success('Active link established! You will now receive trade signals.', { id: toastId });
+      } else {
+        toast.error('GOLDBRICK handshaking failed. Please allow notifications in browser settings.', { id: toastId });
+      }
+    } catch (e) {
+      toast.error('System failure during handshake.', { id: toastId });
+    }
+  };
+
   return (
     <DashboardLayout>
+      <IOSInstallGuide 
+        isOpen={showIOSInstructions} 
+        onClose={() => setShowIOSInstructions(false)} 
+      />
       <div className="space-y-10 pb-12">
         {/* Top Header Section */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -199,6 +224,25 @@ export default function Dashboard() {
              <p className="text-white/40 font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-bold">Welcome Back: {userData?.displayName?.toUpperCase()}</p>
           </div>
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+             {isInstallable && (
+               <Button 
+                 onClick={handleInstallClick}
+                 variant="outline" 
+                 className="flex-1 md:flex-none border-primary/20 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse"
+               >
+                 <Download className="size-4 mr-2" /> Install App
+               </Button>
+             )}
+             {userData && Notification.permission !== 'granted' && (
+               <Button 
+                 onClick={handleEnableNotifications}
+                 variant="outline" 
+                 className="flex-1 md:flex-none border-blue-500/20 bg-blue-500/5 text-blue-400 font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl hover:bg-blue-500/10 transition-all shadow-lg shadow-blue-500/5"
+               >
+                 <Bell className="size-4 mr-2" /> Enable Alerts
+               </Button>
+             )}
+
              <Button onClick={() => navigate('/withdraw')} variant="outline" className="flex-1 md:flex-none border-border bg-secondary font-black uppercase text-[10px] tracking-widest h-10 md:h-12 px-4 md:px-6 rounded-xl text-secondary-foreground hover:bg-secondary/80 transition-all">
                Withdraw
              </Button>
