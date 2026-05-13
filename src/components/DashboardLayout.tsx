@@ -19,14 +19,15 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { auth } from '../lib/firebase';
-import { usePWAInstall } from '../hooks/usePWAInstall';
+import { usePWA } from '../lib/PWAContext';
+import { IOSInstallGuide } from './IOSInstallGuide';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const { userData } = useAuth();
   const navigate = useNavigate();
-  const { isInstallable, handleInstallClick } = usePWAInstall();
+  const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
 
   const menuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -48,6 +49,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-background text-white flex flex-col md:flex-row pb-20 md:pb-0 font-sans">
+      <IOSInstallGuide 
+        isOpen={showIOSInstructions} 
+        onClose={() => setShowIOSInstructions(false)} 
+      />
       {/* Floating Support Button */}
       <Link 
         to="/support"

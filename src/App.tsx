@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ScrollToTop from './components/ScrollToTop';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider, useAuth } from './lib/AuthContext';
+import { PWAProvider } from './lib/PWAContext';
 
 // Pages
 import LandingPage from './pages/LandingPage';
@@ -60,12 +61,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <ScrollToTop />
-        <AppRoutes />
-        <Toaster position="top-right" expand={true} richColors />
-      </BrowserRouter>
-    </AuthProvider>
+    <PWAProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <AppRoutes />
+          <Toaster position="top-right" expand={true} richColors />
+        </BrowserRouter>
+      </AuthProvider>
+    </PWAProvider>
   );
 }

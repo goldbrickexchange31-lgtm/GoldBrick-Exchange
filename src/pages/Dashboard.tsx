@@ -22,7 +22,7 @@ import {
 import DashboardLayout from '../components/DashboardLayout';
 import BTCChart from '../components/BTCChart';
 import { useAuth } from '../lib/AuthContext';
-import { usePWAInstall } from '../hooks/usePWAInstall';
+import { usePWA } from '../lib/PWAContext';
 import { db } from '../lib/firebase';
 import { 
   collection, 
@@ -42,10 +42,11 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { IOSInstallGuide } from '../components/IOSInstallGuide';
 
 export default function Dashboard() {
   const { user, userData } = useAuth();
-  const { isInstallable, handleInstallClick } = usePWAInstall();
+  const { isInstallable, handleInstallClick, showIOSInstructions, setShowIOSInstructions } = usePWA();
   const [allInvestments, setAllInvestments] = useState<any[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
   const [globalActivity, setGlobalActivity] = useState<any[]>([]);
@@ -194,6 +195,10 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
+      <IOSInstallGuide 
+        isOpen={showIOSInstructions} 
+        onClose={() => setShowIOSInstructions(false)} 
+      />
       <div className="space-y-10 pb-12">
         {/* Top Header Section */}
         <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
