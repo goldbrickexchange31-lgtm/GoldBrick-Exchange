@@ -113,26 +113,26 @@ export default function SupportPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-10">
             <div className="xl:col-span-2">
-              <Card className="bg-card border-border flex flex-col h-[650px] shadow-2xl rounded-[3rem] overflow-hidden border">
-                 <CardHeader className="border-b border-border bg-white/5 p-8">
+              <Card className="bg-card border-border flex flex-col h-[82vh] md:h-[700px] shadow-2xl rounded-[2rem] md:rounded-[3rem] overflow-hidden border">
+                 <CardHeader className="border-b border-border bg-white/5 p-4 md:p-8">
                     <div className="flex items-center justify-between">
-                       <div className="flex items-center gap-4">
-                          <div className="size-12 bg-background rounded-2xl border border-border shadow-sm flex items-center justify-center">
-                             <User className="text-primary size-6" />
+                       <div className="flex items-center gap-3 md:gap-4">
+                          <div className="size-10 md:size-12 bg-background rounded-xl md:rounded-2xl border border-border shadow-sm flex items-center justify-center">
+                             <User className="text-primary size-5 md:size-6" />
                           </div>
                           <div>
-                             <CardTitle className="text-lg font-black text-white italic uppercase tracking-tighter">Secure Terminal</CardTitle>
-                             <div className="flex items-center gap-2 text-[10px] text-green-600 font-black uppercase tracking-widest">
-                                <div className="size-2 rounded-full bg-green-500 animate-pulse" />
+                             <CardTitle className="text-base md:text-lg font-black text-white italic uppercase tracking-tighter">Secure Terminal</CardTitle>
+                             <div className="flex items-center gap-2 text-[8px] md:text-[10px] text-green-600 font-black uppercase tracking-widest">
+                                <div className="size-1.5 md:size-2 rounded-full bg-green-500 animate-pulse" />
                                 Active Priority Queue
                              </div>
                           </div>
                        </div>
-                       <Badge className="bg-primary/10 text-primary border-none font-black px-4 py-1.5 rounded-full uppercase text-[9px] tracking-widest shadow-sm">End-to-End Encrypted</Badge>
+                       <Badge className="bg-primary/10 text-primary border-none font-black px-3 md:px-4 py-1 md:py-1.5 rounded-full uppercase text-[8px] md:text-[9px] tracking-widest shadow-sm">Secure Link</Badge>
                     </div>
                  </CardHeader>
                  
-                 <CardContent className="flex-1 overflow-y-auto p-10 space-y-6 no-scrollbar bg-white/5">
+                 <CardContent className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 no-scrollbar bg-white/5 scroll-smooth">
                     {messages.length === 0 && (
                        <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-30 px-12">
                           <div className="size-24 bg-primary/10 rounded-full flex items-center justify-center">
@@ -147,13 +147,13 @@ export default function SupportPage() {
                     {messages.map((m, i) => (
                        <div key={i} className={`flex ${m.senderId === user?.uid ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
                           <div className={`
-                             max-w-[85%] p-6 rounded-3xl text-sm shadow-sm
+                             max-w-[92%] md:max-w-[85%] p-6 md:p-8 rounded-[2rem] text-base md:text-lg shadow-sm
                              ${m.senderId === user?.uid 
                                 ? 'bg-primary text-primary-foreground font-bold rounded-tr-none shadow-lg shadow-primary/10' 
-                                : 'bg-background text-white/80 border border-border rounded-tl-none font-medium'}
+                                : 'bg-background text-white/95 border border-border rounded-tl-none font-medium'}
                           `}>
                              <p className="leading-relaxed whitespace-pre-wrap">{m.text}</p>
-                             <div className={`text-[8px] mt-4 font-black uppercase tracking-widest ${m.senderId === user?.uid ? 'text-primary-foreground/60 text-right font-mono' : 'text-white/20 font-mono'}`}>
+                             <div className={`text-[10px] mt-6 font-black uppercase tracking-widest ${m.senderId === user?.uid ? 'text-primary-foreground/60 text-right font-mono' : 'text-white/20 font-mono'}`}>
                                 {m.createdAt ? new Date(m.createdAt.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'TRANSMITTING...'}
                              </div>
                           </div>
@@ -162,16 +162,16 @@ export default function SupportPage() {
                     <div ref={scrollRef} />
                  </CardContent>
 
-                 <div className="p-8 border-t border-border bg-background shrink-0">
-                    <form onSubmit={handleSendMessage} className="flex gap-4">
+                 <div className="p-4 md:p-8 border-t border-border bg-background shrink-0 sticky bottom-0 z-10">
+                    <form onSubmit={handleSendMessage} className="flex gap-2 md:gap-4">
                        <Input 
-                         placeholder="Communicate your request..." 
-                         className="bg-white/5 border-border flex-1 h-16 text-white placeholder:text-white/20 font-bold px-8 rounded-2xl shadow-inner border-2 italic text-lg"
+                         placeholder="Communicate..." 
+                         className="bg-white/5 border-border flex-1 h-14 md:h-16 text-white placeholder:text-white/20 font-bold px-4 md:px-8 rounded-xl md:rounded-2xl shadow-inner border-2 italic text-base md:text-lg"
                          value={input}
                          onChange={(e) => setInput(e.target.value)}
                        />
-                       <Button type="submit" size="icon" className="size-16 bg-primary text-primary-foreground rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
-                         <Send size={24} />
+                       <Button type="submit" size="icon" className="size-14 md:size-16 bg-primary text-primary-foreground rounded-xl md:rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all">
+                         <Send className="size-5 md:size-6" />
                        </Button>
                     </form>
                  </div>

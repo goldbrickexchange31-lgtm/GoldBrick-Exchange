@@ -28,16 +28,6 @@ export default function LandingPage() {
           <a href="#about" className="hover:text-primary transition-colors">About</a>
         </div>
         <div className="flex gap-4 items-center">
-          {isInstallable && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleInstallClick}
-              className="hidden sm:flex border-primary/50 text-primary hover:bg-primary/10 font-bold h-9 px-4 rounded-lg animate-pulse"
-            >
-              <Download className="mr-2 w-4 h-4" /> App
-            </Button>
-          )}
           <Link to="/login"><Button variant="ghost">Login</Button></Link>
           <Link to="/register"><Button className="bg-primary text-primary-foreground hover:opacity-90 font-bold">Get Started</Button></Link>
         </div>
@@ -68,17 +58,6 @@ export default function LandingPage() {
                 Start Investing Now <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-
-            {isInstallable && (
-              <Button 
-                onClick={handleInstallClick}
-                variant="outline" 
-                size="lg" 
-                className="border-primary/50 text-primary hover:bg-primary/10 font-bold px-8 h-14 text-lg w-full sm:w-auto"
-              >
-                <Download className="mr-2 w-5 h-5" /> Download App
-              </Button>
-            )}
 
             <div className="flex items-center gap-2 text-white/50 justify-center">
               <ShieldCheck className="text-primary w-5 h-5" />

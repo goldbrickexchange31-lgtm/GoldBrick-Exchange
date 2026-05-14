@@ -961,7 +961,7 @@ export default function AdminDashboard() {
 
           {/* Chat Section */}
           {activeSection === 'chat' && (
-            <div className="h-[calc(100vh-180px)]">
+            <div className="h-[85vh] md:h-[calc(100vh-180px)]">
                <AdminChatManager />
             </div>
           )}
@@ -1491,9 +1491,9 @@ function AdminChatManager() {
   );
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-full">
-      <Card className="bg-card border-border md:col-span-1 overflow-hidden flex flex-col rounded-[2.5rem] shadow-md border">
-         <CardHeader className="border-b border-border bg-white/5 p-6">
+    <div className="flex flex-col md:grid md:grid-cols-3 gap-4 md:gap-8 h-full">
+      <Card className={`bg-card border-border md:col-span-1 overflow-hidden flex flex-col rounded-[1.5rem] md:rounded-[2.5rem] shadow-md border ${selectedChat ? 'hidden md:flex' : 'flex h-[60vh] md:h-full'}`}>
+         <CardHeader className="border-b border-border bg-white/5 p-4 md:p-6 shrink-0">
             <CardTitle className="text-[10px] font-black tracking-widest uppercase flex items-center gap-3 text-white">
               <MessageSquare className="size-4 text-primary" /> Active User Chats
             </CardTitle>
@@ -1509,9 +1509,9 @@ function AdminChatManager() {
                             updateDoc(doc(db, 'chats', chat.id), { unreadByAdmin: false });
                         }
                     }}
-                    className={`p-6 cursor-pointer hover:bg-white/5 transition-all border-l-4 ${selectedChat?.id === chat.id ? 'bg-white/5 border-primary' : 'border-transparent'}`}
+                    className={`p-4 md:p-6 cursor-pointer hover:bg-white/5 transition-all border-l-4 ${selectedChat?.id === chat.id ? 'bg-white/5 border-primary' : 'border-transparent'}`}
                   >
-                     <div className="flex justify-between items-start mb-2">
+                     <div className="flex justify-between items-start mb-1 md:mb-2">
                         <div className="font-black text-sm text-white italic uppercase tracking-tighter">{chat.userName}</div>
                         {chat.unreadByAdmin && <div className="size-2 rounded-full bg-primary animate-pulse" />}
                      </div>
@@ -1527,27 +1527,35 @@ function AdminChatManager() {
          </CardContent>
       </Card>
 
-      <Card className="bg-card border-border md:col-span-2 overflow-hidden flex flex-col rounded-[2.5rem] shadow-md border relative">
+      <Card className={`bg-card border-border md:col-span-2 overflow-hidden flex flex-col rounded-[1.5rem] md:rounded-[2.5rem] shadow-md border relative ${selectedChat ? 'flex h-full md:h-full' : 'hidden md:flex'}`}>
          {selectedChat ? (
             <>
-               <CardHeader className="border-b border-border bg-white/5 flex flex-row items-center justify-between p-6 shrink-0">
-                  <div className="flex items-center gap-4">
-                     <div className="size-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-black italic text-lg">
+               <CardHeader className="border-b border-border bg-white/5 flex flex-row items-center justify-between p-4 md:p-6 shrink-0">
+                  <div className="flex items-center gap-3 md:gap-4">
+                     <Button 
+                       variant="ghost" 
+                       size="icon" 
+                       className="md:hidden size-8 text-white/50 hover:text-white"
+                       onClick={() => setSelectedChat(null)}
+                     >
+                       <ChevronRight className="rotate-180" />
+                     </Button>
+                     <div className="size-8 md:size-10 rounded-lg md:rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-black italic text-base">
                         {selectedChat.userName?.substring(0, 1)}
                      </div>
                      <div>
-                        <div className="font-black text-white uppercase italic tracking-tighter text-base leading-none mb-1">{selectedChat.userName}</div>
-                        <div className="text-[10px] text-slate-400 font-mono font-bold tracking-tight">{selectedChat.userEmail}</div>
+                        <div className="font-black text-white uppercase italic tracking-tighter text-sm md:text-base leading-none mb-1">{selectedChat.userName}</div>
+                        <div className="text-[9px] md:text-[10px] text-slate-400 font-mono font-bold tracking-tight">{selectedChat.userEmail}</div>
                      </div>
                   </div>
-                  <Badge className="bg-primary/20 text-primary uppercase text-[8px] tracking-widest border-none px-2 h-6">Live Link</Badge>
+                  <Badge className="bg-primary/20 text-primary uppercase text-[7px] md:text-[8px] tracking-widest border-none px-2 h-5 md:h-6">Live Link</Badge>
                </CardHeader>
-               <CardContent className="flex-1 overflow-y-auto p-8 space-y-6 no-scrollbar bg-white/5">
+               <CardContent className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 no-scrollbar bg-white/5 scroll-smooth">
                   {messages.map((m, i) => (
                      <div key={i} className={`flex ${m.senderId === 'admin' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] p-4 rounded-2xl text-[13px] ${m.senderId === 'admin' ? 'bg-primary text-primary-foreground font-black rounded-tr-none shadow-sm' : 'bg-background text-slate-300 border border-border rounded-tl-none font-medium shadow-sm'}`}>
+                        <div className={`max-w-[92%] md:max-w-[81%] p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] text-sm md:text-base ${m.senderId === 'admin' ? 'bg-primary text-primary-foreground font-black rounded-tr-none shadow-sm' : 'bg-background text-white/90 border border-border rounded-tl-none font-medium shadow-sm'}`}>
                            {m.text}
-                           <div className={`text-[8px] mt-2 opacity-50 font-black ${m.senderId === 'admin' ? 'text-primary-foreground/60 text-right' : 'text-slate-400'}`}>
+                           <div className={`text-[8px] md:text-[10px] mt-3 md:mt-4 opacity-70 font-black tracking-widest ${m.senderId === 'admin' ? 'text-primary-foreground/60 text-right' : 'text-slate-400 font-mono'}`}>
                              {m.createdAt ? format(m.createdAt.toDate(), 'HH:mm') : '...'}
                            </div>
                         </div>
@@ -1555,16 +1563,16 @@ function AdminChatManager() {
                   ))}
                   <div ref={scrollRef} />
                </CardContent>
-               <div className="p-8 border-t border-border bg-white/5 shrink-0">
-                  <form onSubmit={handleSend} className="flex gap-4">
+               <div className="p-4 md:p-8 border-t border-border bg-white/5 shrink-0 sticky bottom-0 z-10">
+                  <form onSubmit={handleSend} className="flex gap-2 md:gap-4">
                      <Input 
-                        placeholder="Type your reply here..." 
-                        className="bg-background border-border h-14 text-sm rounded-xl px-6 focus:border-primary font-bold text-white placeholder:text-slate-200 shadow-sm"
+                        placeholder="Type reply..." 
+                        className="bg-background border-border h-12 md:h-14 text-sm rounded-xl px-4 md:px-6 focus:border-primary font-bold text-white placeholder:text-slate-200 shadow-sm"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                      />
-                     <Button type="submit" size="icon" className="size-14 rounded-xl bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20 hover:scale-105 transition-all">
-                        <Share2 className="size-6" />
+                     <Button type="submit" size="icon" className="size-12 md:size-14 rounded-xl shrink-0 bg-primary text-primary-foreground font-black shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                        <Share2 className="size-5 md:size-6" />
                      </Button>
                   </form>
                </div>

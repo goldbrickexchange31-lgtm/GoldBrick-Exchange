@@ -33,16 +33,20 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const checkInstallability = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
       
-      // If we have the prompt OR it's iOS and not already installed, show install option
-      if ((deferredPrompt || isIOSDevice) && !isStandalone) {
-        setIsInstallable(true);
-      } else if (!isStandalone) {
-        // Fallback: Show button even if prompt was missed, clicking will handle it
+      // If we are already in standalone mode (installed), NEVER show install option
+      if (isStandalone) {
+        setIsInstallable(false);
+        return;
+      }
+
+      // If we have the prompt OR it's iOS, we can consider it installable
+      if (deferredPrompt || isIOSDevice) {
         setIsInstallable(true);
       } else {
-        setIsInstallable(false);
+        // Fallback: Show button to allow manual instructions if prompt was missed
+        setIsInstallable(true);
       }
     };
 
