@@ -34,23 +34,40 @@ if (typeof window !== 'undefined') {
   });
 }
 
+// Check if currently running as a PWA
+const isAppInstalled = () => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+};
+
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [isInstallable, setIsInstallable] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
   useEffect(() => {
     const checkInstallability = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
-      
       // If we are already in standalone (installed), hide button
-      if (isStandalone) {
+      if (isAppInstalled()) {
+        console.log('App: Already running in standalone mode');
         setIsInstallable(false);
         return;
       }
 
-      // Hide button until native prompt is actually available to avoid "not available" alert
+      // Show button if handled prompt is available
+      // The browser fires 'beforeinstallprompt' again after uninstall + refresh
       setIsInstallable(!!deferredPrompt);
     };
+
+    // Listen for media changes (installation/uninstallation detection in real-time)
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      console.log('App: display-mode change detected:', e.matches);
+      checkInstallability();
+    };
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleMediaChange);
+    }
 
     // Register callback for early events
     pwaUpdateCallback = checkInstallability;
@@ -71,6 +88,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       pwaUpdateCallback = null;
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleMediaChange);
+      }
     };
   }, []);
 

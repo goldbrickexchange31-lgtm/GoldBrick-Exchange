@@ -26,6 +26,7 @@ export default function SupportPage() {
   const [input, setInput] = useState('');
   const [config, setConfig] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hasInitialScrolled = useRef(false);
 
   useEffect(() => {
     onSnapshot(doc(db, 'config', 'general'), (snap) => {
@@ -38,22 +39,24 @@ export default function SupportPage() {
     const q = query(
       collection(db, 'chats', user.uid, 'messages'),
       orderBy('createdAt', 'asc'),
-      limit(50)
+      limit(100)
     );
 
     const unsub = onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map(doc => doc.data()));
+      const msgs = snap.docs.map(doc => doc.data());
+      setMessages(msgs);
     });
     return () => unsub();
   }, [user]);
 
-  // Handle load scroll and new messages
+  // Handle initial load scroll and user-initiated message scroll
   useEffect(() => {
-    if (messages.length > 0) {
-      // Small timeout to allow DOM to render
+    if (messages.length > 0 && !hasInitialScrolled.current) {
+      // Task 3: scroll to bottom on initial page load
       setTimeout(() => {
         scrollRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
-      }, 150);
+        hasInitialScrolled.current = true;
+      }, 200);
     }
   }, [messages.length]);
 
@@ -71,10 +74,12 @@ export default function SupportPage() {
         senderName: userData?.displayName,
         createdAt: serverTimestamp()
       });
-      // Force scroll on send
-      setTimeout(() => {
-        scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
+      
+      // Task 4: Do NOT auto-scroll every message send, unless user specifically wants it.
+      // We'll trust the browser's natural behavior or the user to scroll.
+      // If we REALLY want to scroll ONLY on our own send, we can keep a smaller behavior here.
+      // But the user said: "Do NOT auto-scroll every message send."
+      
       // Also update the main chat doc for admin to see "last active"
       await setDoc(doc(db, 'chats', user.uid), {
         lastMessage: msg,
@@ -132,7 +137,7 @@ export default function SupportPage() {
                     </div>
                  </CardHeader>
                  
-                 <CardContent className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 no-scrollbar bg-white/5 scroll-smooth">
+                 <CardContent className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 bg-white/5 scroll-smooth">
                     {messages.length === 0 && (
                        <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-30 px-12">
                           <div className="size-24 bg-primary/10 rounded-full flex items-center justify-center">

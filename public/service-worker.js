@@ -57,11 +57,12 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 // Generic PWA Caching
-const CACHE_NAME = 'goldbrick-v1';
+const CACHE_NAME = 'goldbrick-v1.2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/og-image.png'
 ];
 
 self.addEventListener('install', (event) => {
