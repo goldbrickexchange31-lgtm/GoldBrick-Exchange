@@ -71,6 +71,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={showIOSInstructions} 
         onClose={() => setShowIOSInstructions(false)} 
       />
+      {/* Floating Install Button for Mobile */}
+      {isInstallable && (
+        <button 
+          onClick={handleInstallClick}
+          className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-primary text-white font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 animate-bounce border-2 border-white/20"
+        >
+          <Download className="w-4 h-4" /> ⬇ Install App
+        </button>
+      )}
+
       {/* Floating Support Button */}
       <Link 
         to="/support"
@@ -92,7 +102,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               onClick={handleInstallClick}
               className="h-8 border-primary/40 bg-primary/10 text-primary font-black uppercase text-[9px] tracking-widest px-3 rounded-lg animate-pulse"
             >
-              <Download className="size-3 mr-1" /> Install
+              <Download className="size-3 mr-1" /> ⬇ Install App
             </Button>
           )}
           <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white h-8 w-8">
@@ -174,7 +184,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 variant="outline"
                 className="h-10 border-primary/40 bg-primary/5 text-primary font-black uppercase text-[10px] tracking-widest px-6 rounded-xl hover:bg-primary/10 transition-all animate-pulse shadow-lg shadow-primary/5"
               >
-                <Download className="size-4 mr-2" /> Download App
+                <Download className="size-4 mr-2" /> ⬇ Install App
               </Button>
             )}
             <div className="flex items-center gap-3 p-1.5 bg-white/5 border border-border rounded-2xl">
