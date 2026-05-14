@@ -14,16 +14,6 @@ const PWAContext = createContext<PWAContextType | undefined>(undefined);
 // Storage for the browser's install prompt event
 let deferredPrompt: any = null;
 
-// Catch the prompt event as early as possible
-if (typeof window !== 'undefined') {
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    // Dispatch a custom event so the hook can react
-    window.dispatchEvent(new CustomEvent('pwa-install-ready'));
-  });
-}
-
 // Initial check for iOS
 const isIOSDevice = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 
@@ -43,66 +33,82 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // If we have the prompt OR it's iOS, we can consider it installable
-      if (deferredPrompt || isIOSDevice) {
+      // If we have the prompt, it's definitely installable
+      if (deferredPrompt) {
+        setIsInstallable(true);
+      } else if (isIOSDevice) {
+        // iOS doesn't support the prompt event, but we can show instructions
         setIsInstallable(true);
       } else {
-        // Fallback: Show button to allow manual instructions if prompt was missed
-        setIsInstallable(true);
+        // On Android/Chrome, we rely on beforeinstallprompt event to enable the button
+        // But we can show it as a fallback if desired. 
+        // For now, let's only show if we have the prompt or instructions to give.
+        setIsInstallable(!!deferredPrompt);
       }
     };
 
-    const onInstallReady = () => {
+    // Listen for the browser's native install prompt
+    const handleBeforeInstallPrompt = (e: any) => {
+      console.log('App: Native beforeinstallprompt captured');
+      e.preventDefault();
+      deferredPrompt = e;
       setIsInstallable(true);
     };
 
-    window.addEventListener('pwa-install-ready', onInstallReady);
-    window.addEventListener('appinstalled', () => setIsInstallable(false));
+    const handleAppInstalled = () => {
+      console.log('App: Successfully installed');
+      setIsInstallable(false);
+      deferredPrompt = null;
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
     
+    // Initial check
     checkInstallability();
 
+    // Re-check periodically in case state changes without events
+    const interval = setInterval(checkInstallability, 3000);
+
     return () => {
-      window.removeEventListener('pwa-install-ready', onInstallReady);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+      clearInterval(interval);
     };
   }, []);
 
   const handleInstallClick = async () => {
-    // 1. Handle iOS
+    // 1. Handle iOS (Manual Instructions)
     if (isIOSDevice) {
       setShowIOSInstructions(true);
       return;
     }
 
-    // 2. Handle prompt available
+    // 2. Handle native prompt available
     if (deferredPrompt) {
       try {
-        const promptEvent = deferredPrompt;
-        // The prompt() method must be called within a user gesture.
-        promptEvent.prompt();
+        console.log('App: Triggering native install prompt');
+        deferredPrompt.prompt();
         
-        const { outcome } = await promptEvent.userChoice;
-        console.log('User PWA install choice:', outcome);
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log('App: User PWA install choice:', outcome);
         
         if (outcome === 'accepted') {
           setIsInstallable(false);
           deferredPrompt = null;
         }
       } catch (err) {
-        console.error('Error triggering PWA prompt:', err);
+        console.error('App: Error triggering PWA prompt:', err);
       }
       return;
     }
     
-    // 3. Fallback: No prompt captured
-    // Show a manual instruction toast or modal
-    if (!isStandalone) {
-      if (isIOSDevice) {
-        setShowIOSInstructions(true);
-      } else {
-        alert('To install this app: \n1. Click your browser menu (⋮ or ⋯)\n2. Select "Install App" or "Add to Home Screen"');
-      }
+    // 3. Fallback: No prompt captured yet
+    if (!isStandalone && !isIOSDevice) {
+      console.warn('App: Install prompt trigger requested but deferredPrompt is missing.');
+      // Help the user find the manual option if the automatic one failed
+      alert('Installation is available via your browser menu (⋮ or ⋯) -> "Install App" or "Add to Home Screen"');
     }
-    console.log('PWA Prompt not available yet.');
   };
 
   return (
@@ -125,4 +131,3 @@ export function usePWA() {
   }
   return context;
 }
-
