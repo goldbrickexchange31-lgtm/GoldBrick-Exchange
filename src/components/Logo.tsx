@@ -9,70 +9,40 @@ export const Logo: React.FC<{ className?: string }> = ({ className = "h-12" }) =
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="blue-primary" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0066FF" />
-            <stop offset="50%" stopColor="#3B82F6" />
-            <stop offset="100%" stopColor="#1D4ED8" />
-          </linearGradient>
-          <linearGradient id="blue-shadow" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#1E3A8A" />
-            <stop offset="100%" stopColor="#1D4ED8" />
-          </linearGradient>
-          <linearGradient id="blue-highlight" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#93C5FD" />
-            <stop offset="100%" stopColor="#3B82F6" />
+          <linearGradient id="blue-premium" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0057ff" />
+            <stop offset="100%" stopColor="#003dcb" />
           </linearGradient>
         </defs>
 
         <g transform="translate(5, 5) scale(0.9)">
-          {/* Hexagon Frame / Shadow base */}
+          <rect x="0" y="0" width="100" height="100" rx="22" fill="url(#blue-premium)" />
           <path
-            d="M50 0 L93.3 25 V75 L50 100 L6.7 75 V25 Z"
-            fill="#1E3A8A"
+            d="M50 20 L76 35 V65 L50 80 L24 65 V35 Z"
+            fill="white"
             opacity="0.1"
           />
-          
-          {/* Main Hexagon Body */}
           <path
-            d="M50 2 L91.3 26 V74 L50 98 L8.7 74 V26 Z"
-            fill="url(#blue-primary)"
-          />
-
-          {/* Simple Bold 'G' Icon */}
-          <text
-            x="50"
-            y="62"
-            fontFamily="ui-sans-serif, system-ui, sans-serif"
-            fontSize="64"
-            fontWeight="900"
-            fill="white"
-            opacity="0.9"
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className="tracking-tighter"
-          >
-            G
-          </text>
-          
-          {/* Front Bevel highlight for depth */}
-          <path
-            d="M50 2 L91.3 26 V30 L50 6 L8.7 30 V26 Z"
-            fill="url(#blue-highlight)"
-            opacity="0.3"
+            d="M65 35 C65 35 58 30 50 30 C40 30 33 37 33 50 C33 63 40 70 50 70 C58 70 65 65 65 65 V55 H50"
+            stroke="white"
+            strokeWidth="8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
           />
         </g>
       </svg>
       
       <div className="flex flex-col justify-center">
-        <div className="text-2xl font-black italic vibrant-text tracking-tighter leading-none">
+        <div className="text-2xl font-black italic tracking-tighter leading-none text-white">
           GOLDBRICK
         </div>
-        <div className="flex items-center gap-2 mt-1 px-1">
-          <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
-          <span className="text-[10px] font-bold text-primary tracking-[0.5em] uppercase leading-none">
+        <div className="flex items-center gap-2 mt-1">
+          <div className="h-[1px] flex-1 bg-white/20" />
+          <span className="text-[9px] font-bold text-white/60 tracking-[0.3em] uppercase leading-none">
             EXCHANGE
           </span>
-          <div className="h-[0.5px] flex-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
+          <div className="h-[1px] flex-1 bg-white/20" />
         </div>
       </div>
     </div>

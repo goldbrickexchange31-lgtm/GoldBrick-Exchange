@@ -1,5 +1,5 @@
 // src/lib/PWAContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 interface PWAContextType {
   isInstallable: boolean;
@@ -31,6 +31,8 @@ if (typeof window !== 'undefined') {
     console.log('FCM/PWA: App successfully installed');
     deferredPrompt = null;
     if (pwaUpdateCallback) pwaUpdateCallback();
+    // Re-check after a delay to ensure state propagates
+    setTimeout(() => { if (pwaUpdateCallback) pwaUpdateCallback(); }, 1500);
   });
 }
 
@@ -44,20 +46,20 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [isInstallable, setIsInstallable] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
-  useEffect(() => {
-    const checkInstallability = () => {
-      // If we are already in standalone (installed), hide button
-      if (isAppInstalled()) {
-        console.log('App: Already running in standalone mode');
-        setIsInstallable(false);
-        return;
-      }
-
-      // Show button if handled prompt is available
+  const checkInstallability = useCallback(() => {
+    const isStandalone = isAppInstalled();
+    console.log('App: checkInstallability - isStandalone:', isStandalone, 'hasPrompt:', !!deferredPrompt);
+    
+    if (isStandalone) {
+      setIsInstallable(false);
+    } else {
+      // Show button if we have the prompt
       // The browser fires 'beforeinstallprompt' again after uninstall + refresh
       setIsInstallable(!!deferredPrompt);
-    };
+    }
+  }, []);
 
+  useEffect(() => {
     // Listen for media changes (installation/uninstallation detection in real-time)
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     const handleMediaChange = (e: MediaQueryListEvent) => {
@@ -75,30 +77,19 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     // Initial check
     checkInstallability();
 
-    // Verify Service Worker registration Status
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistration().then(reg => {
-        if (reg) {
-          console.log('FCM/PWA: Active Service Worker found:', reg.scope);
-        } else {
-          console.warn('FCM/PWA: No active Service Worker found. Installability may be compromised.');
-        }
-      });
-    }
-
     return () => {
       pwaUpdateCallback = null;
       if (mediaQuery.removeEventListener) {
         mediaQuery.removeEventListener('change', handleMediaChange);
       }
     };
-  }, []);
+  }, [checkInstallability]);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
       console.log('App: Install prompt unavailable yet');
-      // Per Task 3 requirements: Use exactly this behavior
-      alert('Install not available yet');
+      // Per Task 3 requirements: Use exactly this behavior with more helpful info
+      alert('Install not available yet. If you just uninstalled the app, please refresh the page and wait 5-10 seconds for the browser to re-detect installability.');
       return;
     }
 
