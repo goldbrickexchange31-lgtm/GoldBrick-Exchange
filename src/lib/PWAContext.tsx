@@ -48,8 +48,11 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Show if we have the prompt OR if it's iOS (manual instructions)
-      setIsInstallable(!!deferredPrompt || isIOSDevice);
+      // Task 1: "Do NOT hide it permanently. Must always be visible on mobile."
+      // This implies displaying it even if not strictly "ready" yet, 
+      // but we need to handle the click.
+      // However, we only want to show it to mobile users or if we have the prompt.
+      setIsInstallable(true);
     };
 
     // Register callback for early events
@@ -76,11 +79,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      console.log('App: Install prompt unavailable');
-      // If it's iOS, we can still show instructions through the UI (not alert)
-      if (isIOSDevice) {
-        setShowIOSInstructions(true);
-      }
+      console.log('App: Install prompt unavailable yet');
+      // Per Task 3 requirements: Use exactly this behavior
+      alert('Install not available yet');
       return;
     }
 
@@ -89,16 +90,19 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       deferredPrompt.prompt();
       
       const { outcome } = await deferredPrompt.userChoice;
-      console.log('App: Install result:', outcome);
+      console.log('App: User PWA install choice:', outcome);
+      
+      // Clear the prompt after the attempt regardless of outcome
+      deferredPrompt = null;
       
       if (outcome === 'accepted') {
         console.log('App: User installed app');
         setIsInstallable(false);
-        deferredPrompt = null;
       }
     } catch (err) {
       console.error('App: Error triggering PWA prompt:', err);
       deferredPrompt = null;
+      setIsInstallable(false);
     }
   };
 

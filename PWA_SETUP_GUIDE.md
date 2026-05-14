@@ -29,12 +29,14 @@ To ensure everything works perfectly in production, follow these steps:
 ## 5. Testing the PWA
 1. Ensure you have added the `VITE_FIREBASE_VAPID_KEY` to your secrets/env.
 2. **IMPORTANT**: Open the site in a **new tab/browser window**. The AI Studio iframe blocks the native "Install App" prompt.
-3. Once in a new tab, wait 5-10 seconds for the browser to detect the PWA. The "Install App" button should then appear in the header.
-4. Click the "Install App" button. If supported, you will see the native Chrome/Android install popup.
-5. If the app is already installed, the button will be hidden automatically.
+3. Once in a new tab, the browser will analyze your site. This can take 5-30 seconds.
+4. The "**⬇ Install App**" button will appear in the dashboard header (on desktop) or as a floating button (on mobile) as soon as the browser confirms the app is installable.
+5. Click the button to trigger the native Chrome/Android install popup.
 
-## 6. Troubleshooting PWA Install
-- **Iframe Restriction**: The native install prompt will NOT trigger inside the AI Studio preview frame. You MUST use the "Open in new tab" icon.
-- **Service Worker**: Check Chrome DevTools -> Application -> Service Workers. It should show `/service-worker.js` as active and running.
-- **Manifest**: Check Chrome DevTools -> Application -> Manifest. There should be no errors.
-- **Security Check**: Chrome requires a valid HTTPS certificate and no manifest errors for the prompt to fire.
+## 6. Troubleshooting
+- If the button doesn't show:
+  - You might already have the app installed.
+  - You are using an unsupported browser (Firefox/Safari don't support `beforeinstallprompt`).
+  - You are still inside the AI Studio iframe (Use the "Open in new tab" icon).
+  - Open Chrome DevTools -> Application -> Manifest to check for any red errors.
+  - Check Chrome DevTools -> Application -> Service Workers. It should show `/service-worker.js` as active and running.

@@ -71,13 +71,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={showIOSInstructions} 
         onClose={() => setShowIOSInstructions(false)} 
       />
-      {/* Floating Install Button for Mobile */}
+      {/* Fixed Install Button as requested in Task 1 */}
       {isInstallable && (
         <button 
+          id="installBtn"
           onClick={handleInstallClick}
-          className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] bg-primary text-white font-black uppercase text-[10px] tracking-widest px-6 py-3 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 animate-bounce border-2 border-white/20"
+          className="fixed bottom-[90px] right-5 z-[70] bg-blue-600 text-white font-bold px-5 py-3 rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.3)] flex items-center gap-2 hover:bg-blue-700 transition-all active:scale-95 sm:bottom-24 md:bottom-8 md:right-32"
         >
-          <Download className="w-4 h-4" /> ⬇ Install App
+          <Download className="w-5 h-5" /> ⬇ Install App
         </button>
       )}
 
