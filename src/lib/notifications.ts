@@ -24,7 +24,7 @@ export async function requestNotificationPermission(userId: string) {
     // 1. Explicitly Register Service Worker for FCM
     let registration: ServiceWorkerRegistration | undefined;
     if ('serviceWorker' in navigator) {
-      registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      registration = await navigator.serviceWorker.register('/service-worker.js', {
         scope: '/'
       });
       console.log('FCM: Service Worker registered:', registration.scope);

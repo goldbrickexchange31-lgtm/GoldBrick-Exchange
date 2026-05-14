@@ -1,11 +1,11 @@
 {
-  "name": "GoldBrick Exchange",
-  "short_name": "GoldBrick",
+  "name": "Goldbrick Exchange",
+  "short_name": "Goldbrick",
   "description": "Premium Gold Mining & Crypto Investment Platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000B1E",
-  "theme_color": "#000B1E",
+  "background_color": "#050035",
+  "theme_color": "#050035",
   "orientation": "portrait",
   "scope": "/",
   "icons": [

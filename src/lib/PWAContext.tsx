@@ -78,36 +78,30 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleInstallClick = async () => {
-    // 1. Handle iOS (Manual Instructions)
-    if (isIOSDevice) {
-      setShowIOSInstructions(true);
-      return;
-    }
-
-    // 2. Handle native prompt available
-    if (deferredPrompt) {
-      try {
-        console.log('App: Triggering native install prompt');
-        deferredPrompt.prompt();
-        
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log('App: User PWA install choice:', outcome);
-        
-        if (outcome === 'accepted') {
-          setIsInstallable(false);
-          deferredPrompt = null;
-        }
-      } catch (err) {
-        console.error('App: Error triggering PWA prompt:', err);
+    if (!deferredPrompt) {
+      console.log('App: Install prompt unavailable');
+      // If it's iOS, we can still show instructions through the UI (not alert)
+      if (isIOSDevice) {
+        setShowIOSInstructions(true);
       }
       return;
     }
-    
-    // 3. Fallback: No prompt captured yet
-    if (!isStandalone && !isIOSDevice) {
-      console.warn('App: Install prompt trigger requested but deferredPrompt is missing.');
-      // Help the user find the manual option if the automatic one failed
-      alert('Installation is available via your browser menu (⋮ or ⋯) -> "Install App" or "Add to Home Screen"');
+
+    try {
+      console.log('App: Triggering native install prompt');
+      deferredPrompt.prompt();
+      
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('App: Install result:', outcome);
+      
+      if (outcome === 'accepted') {
+        console.log('App: User installed app');
+        setIsInstallable(false);
+        deferredPrompt = null;
+      }
+    } catch (err) {
+      console.error('App: Error triggering PWA prompt:', err);
+      deferredPrompt = null;
     }
   };
 
