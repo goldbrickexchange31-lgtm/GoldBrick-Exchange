@@ -48,11 +48,8 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Task 1: "Do NOT hide it permanently. Must always be visible on mobile."
-      // This implies displaying it even if not strictly "ready" yet, 
-      // but we need to handle the click.
-      // However, we only want to show it to mobile users or if we have the prompt.
-      setIsInstallable(true);
+      // Hide button until native prompt is actually available to avoid "not available" alert
+      setIsInstallable(!!deferredPrompt);
     };
 
     // Register callback for early events

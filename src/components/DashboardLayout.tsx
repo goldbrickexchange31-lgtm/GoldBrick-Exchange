@@ -71,6 +71,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={showIOSInstructions} 
         onClose={() => setShowIOSInstructions(false)} 
       />
+
+      {/* Floating Support Button */}
+      <Link 
+        to="/support"
+        className="fixed bottom-24 right-6 z-[60] md:bottom-8 md:right-8 bg-primary w-14 h-14 rounded-full flex items-center justify-center shadow-2xl shadow-primary/30 hover:scale-110 transition-transform cursor-pointer"
+      >
+        <MessageSquare className="text-primary-foreground w-7 h-7" />
+      </Link>
       {/* Mobile Top Header */}
       <header className="md:hidden flex items-center justify-between p-4 border-b border-border bg-background sticky top-0 z-50">
         <Link to="/dashboard" className="flex items-center gap-2">
