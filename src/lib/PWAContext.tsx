@@ -13,67 +13,64 @@ const PWAContext = createContext<PWAContextType | undefined>(undefined);
 
 // Storage for the browser's install prompt event
 let deferredPrompt: any = null;
+let pwaUpdateCallback: (() => void) | null = null;
 
 // Initial check for iOS
-const isIOSDevice = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+const isIOSDevice = typeof window !== 'undefined' && (/iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase()) || (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1));
+
+// Universal listener (outside component to catch early events)
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('FCM/PWA: Native beforeinstallprompt captured early');
+    e.preventDefault();
+    deferredPrompt = e;
+    if (pwaUpdateCallback) pwaUpdateCallback();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('FCM/PWA: App successfully installed');
+    deferredPrompt = null;
+    if (pwaUpdateCallback) pwaUpdateCallback();
+  });
+}
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [isInstallable, setIsInstallable] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
     const checkInstallability = () => {
-      const standalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
-      setIsStandalone(standalone);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
       
-      // If we are already in standalone mode (installed), NEVER show install option
-      if (standalone) {
+      // If we are already in standalone (installed), hide button
+      if (isStandalone) {
         setIsInstallable(false);
         return;
       }
 
-      // If we have the prompt, it's definitely installable
-      if (deferredPrompt) {
-        setIsInstallable(true);
-      } else if (isIOSDevice) {
-        // iOS doesn't support the prompt event, but we can show instructions
-        setIsInstallable(true);
-      } else {
-        // On Android/Chrome, we rely on beforeinstallprompt event to enable the button
-        // But we can show it as a fallback if desired. 
-        // For now, let's only show if we have the prompt or instructions to give.
-        setIsInstallable(!!deferredPrompt);
-      }
+      // Show if we have the prompt OR if it's iOS (manual instructions)
+      setIsInstallable(!!deferredPrompt || isIOSDevice);
     };
 
-    // Listen for the browser's native install prompt
-    const handleBeforeInstallPrompt = (e: any) => {
-      console.log('App: Native beforeinstallprompt captured');
-      e.preventDefault();
-      deferredPrompt = e;
-      setIsInstallable(true);
-    };
-
-    const handleAppInstalled = () => {
-      console.log('App: Successfully installed');
-      setIsInstallable(false);
-      deferredPrompt = null;
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    // Register callback for early events
+    pwaUpdateCallback = checkInstallability;
     
     // Initial check
     checkInstallability();
 
-    // Re-check periodically in case state changes without events
-    const interval = setInterval(checkInstallability, 3000);
+    // Verify Service Worker registration Status
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg) {
+          console.log('FCM/PWA: Active Service Worker found:', reg.scope);
+        } else {
+          console.warn('FCM/PWA: No active Service Worker found. Installability may be compromised.');
+        }
+      });
+    }
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
-      clearInterval(interval);
+      pwaUpdateCallback = null;
     };
   }, []);
 

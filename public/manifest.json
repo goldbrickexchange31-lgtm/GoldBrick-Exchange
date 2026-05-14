@@ -1,6 +1,7 @@
 {
   "name": "Goldbrick Exchange",
   "short_name": "Goldbrick",
+  "id": "/?source=pwa",
   "description": "Premium Gold Mining & Crypto Investment Platform",
   "start_url": "/",
   "display": "standalone",

@@ -33,9 +33,9 @@ export default function LandingPage() {
               variant="outline" 
               size="sm" 
               onClick={handleInstallClick}
-              className="hidden sm:flex border-primary/50 text-primary hover:bg-primary/10 font-bold h-9 px-4 rounded-lg animate-pulse"
+              className="flex border-primary/50 text-primary hover:bg-primary/10 font-bold h-9 px-4 rounded-lg animate-pulse"
             >
-              <Download className="mr-2 w-4 h-4" /> Install App
+              <Download className="mr-2 w-4 h-4" /> Install
             </Button>
           )}
           <Link to="/login"><Button variant="ghost">Login</Button></Link>
