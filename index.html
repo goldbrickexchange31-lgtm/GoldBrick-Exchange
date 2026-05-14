@@ -33,12 +33,14 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      // Service worker is registered via src/lib/notifications.ts and usePWA context
+      // but we keep a basic registration here as a fallback for app installability logic
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/firebase-messaging-sw.js').then(registration => {
             console.log('SW registered: ', registration.scope);
-          }).catch(registrationError => {
-            console.log('SW registration failed: ', registrationError);
+          }).catch(err => {
+            console.warn('SW registration failed: ', err);
           });
         });
       }

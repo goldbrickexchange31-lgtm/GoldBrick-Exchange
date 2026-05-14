@@ -159,16 +159,21 @@ export default function AdminDashboard() {
 
     // Notification Setup
     let unsubscribeForeground: () => void = () => {};
-    try {
-      if (auth.currentUser) {
-        requestNotificationPermission(auth.currentUser.uid).catch(console.error);
-        onForegroundMessage().then(unsub => {
+    const setupNotifications = async () => {
+      try {
+        if (auth.currentUser) {
+          const token = await requestNotificationPermission(auth.currentUser.uid);
+          if (token) {
+            console.log('FCM: Admin token active');
+          }
+          const unsub = await onForegroundMessage();
           unsubscribeForeground = unsub;
-        });
+        }
+      } catch (e) {
+        console.error("FCM: Notification setup failed", e);
       }
-    } catch (e) {
-      console.error("Notification setup failed", e);
-    }
+    };
+    setupNotifications();
 
     setLoading(false);
     return () => {
@@ -1153,6 +1158,20 @@ export default function AdminDashboard() {
                                  onClick={() => setConfig({...config, notificationsActive: config.notificationsActive === false ? true : false})}
                                >
                                  {config.notificationsActive !== false ? 'Alerts: Active' : 'Alerts: Paused'}
+                               </Button>
+                               <Button 
+                                 type="button"
+                                 variant="outline" 
+                                 className="h-12 rounded-xl font-black uppercase text-[10px] tracking-widest border-primary/50 text-white hover:bg-primary/10"
+                                 onClick={async () => {
+                                   if (auth.currentUser) {
+                                     const token = await requestNotificationPermission(auth.currentUser.uid);
+                                     if (token) toast.success('Notifications Synchronized!');
+                                     else toast.error('Permission denied or FCM error.');
+                                   }
+                                 }}
+                               >
+                                 Sync Push Device
                                </Button>
                             </div>
                          </div>

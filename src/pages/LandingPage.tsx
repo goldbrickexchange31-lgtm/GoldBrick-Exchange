@@ -28,6 +28,16 @@ export default function LandingPage() {
           <a href="#about" className="hover:text-primary transition-colors">About</a>
         </div>
         <div className="flex gap-4 items-center">
+          {isInstallable && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleInstallClick}
+              className="hidden sm:flex border-primary/50 text-primary hover:bg-primary/10 font-bold h-9 px-4 rounded-lg animate-pulse"
+            >
+              <Download className="mr-2 w-4 h-4" /> Install App
+            </Button>
+          )}
           <Link to="/login"><Button variant="ghost">Login</Button></Link>
           <Link to="/register"><Button className="bg-primary text-primary-foreground hover:opacity-90 font-bold">Get Started</Button></Link>
         </div>

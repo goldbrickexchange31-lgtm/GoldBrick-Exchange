@@ -22,13 +22,17 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   
-  const notificationTitle = payload.notification.title || 'New Notification';
+  const notificationTitle = payload.notification?.title || 'GoldBrick Notification';
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: payload.notification.icon || '/og-image.png',
+    body: payload.notification?.body || 'New update available on GoldBrick.',
+    icon: payload.notification?.icon || '/og-image.png',
+    badge: '/og-image.png',
+    data: payload.data,
+    vibrate: [200, 100, 200],
+    tag: payload.data?.tag || 'default-tag'
   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
 // Handle notification click

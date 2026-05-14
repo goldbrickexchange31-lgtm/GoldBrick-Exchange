@@ -166,6 +166,103 @@ async function startNotificationListener() {
     const firestore = getDb();
     const messaging = admin.messaging();
 
+    // Listen for new registrations
+    firestore.collection('users').onSnapshot(async (snapshot) => {
+      const changes = snapshot.docChanges();
+      for (const change of changes) {
+        if (change.type === 'added') {
+          const user = change.doc.data();
+          const createdAt = user.createdAt?.toDate ? user.createdAt.toDate() : new Date();
+          
+          if (new Date().getTime() - createdAt.getTime() < 10000) {
+            console.log(`[PUSH-USER] New user registered: ${user.fullName} (${user.email})`);
+            
+            const tokens: string[] = [];
+            const adminSnap = await firestore.collection('users').where('role', '==', 'admin').get();
+            adminSnap.forEach(uDoc => {
+              const uData = uDoc.data();
+              if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                tokens.push(...uData.fcmTokens);
+              }
+            });
+
+            if (tokens.length > 0) {
+              const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
+              if (uniqueTokens.length === 0) return;
+
+              const message = {
+                notification: {
+                  title: "👤 NEW USER REGISTRATION",
+                  body: `${user.fullName} just joined GoldBrick Exchange.`,
+                },
+                webpush: {
+                  fcm_options: { link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' },
+                  notification: {
+                    icon: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
+                    requireInteraction: true,
+                    tag: 'new-user'
+                  }
+                },
+                tokens: uniqueTokens
+              };
+
+              await messaging.sendEachForMulticast(message).catch(e => console.error('[PUSH-USER] Error:', e));
+            }
+          }
+        }
+      }
+    });
+
+    // Listen for new withdrawals
+    firestore.collection('transactions')
+      .where('type', '==', 'withdrawal')
+      .where('status', '==', 'pending')
+      .onSnapshot(async (snapshot) => {
+      const changes = snapshot.docChanges();
+      for (const change of changes) {
+        if (change.type === 'added') {
+          const tx = change.doc.data();
+          const createdAt = tx.createdAt?.toDate ? tx.createdAt.toDate() : new Date();
+          
+          if (new Date().getTime() - createdAt.getTime() < 10000) {
+            console.log(`[PUSH-WITHDRAWAL] New withdrawal request: $${tx.amount} from ${tx.userName}`);
+            
+            const tokens: string[] = [];
+            const adminSnap = await firestore.collection('users').where('role', '==', 'admin').get();
+            adminSnap.forEach(uDoc => {
+              const uData = uDoc.data();
+              if (uData.fcmTokens && Array.isArray(uData.fcmTokens)) {
+                tokens.push(...uData.fcmTokens);
+              }
+            });
+
+            if (tokens.length > 0) {
+              const uniqueTokens = Array.from(new Set(tokens.filter(t => typeof t === 'string' && t.length > 10)));
+              if (uniqueTokens.length === 0) return;
+
+              const message = {
+                notification: {
+                  title: "💸 WITHDRAWAL REQUEST",
+                  body: `${tx.userName} requested a withdrawal of $${tx.amount}. Action required.`,
+                },
+                webpush: {
+                  fcm_options: { link: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/admin' },
+                  notification: {
+                    icon: 'https://ais-pre-224n6rm73lzpde37om5nik-815345978387.europe-west2.run.app/favicon.ico',
+                    requireInteraction: true,
+                    tag: 'withdrawal-alert'
+                  }
+                },
+                tokens: uniqueTokens
+              };
+
+              await messaging.sendEachForMulticast(message).catch(e => console.error('[PUSH-WITHDRAWAL] Error:', e));
+            }
+          }
+        }
+      }
+    });
+
     // Listen for changes in chats
     firestore.collection('chats').onSnapshot(async (snapshot) => {
       const changes = snapshot.docChanges();

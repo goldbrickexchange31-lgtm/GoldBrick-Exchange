@@ -30,13 +30,15 @@ const isIOSDevice = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(win
 export function PWAProvider({ children }: { children: React.ReactNode }) {
   const [isInstallable, setIsInstallable] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
     const checkInstallability = () => {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+      const standalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+      setIsStandalone(standalone);
       
       // If we are already in standalone mode (installed), NEVER show install option
-      if (isStandalone) {
+      if (standalone) {
         setIsInstallable(false);
         return;
       }
@@ -92,7 +94,14 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     }
     
     // 3. Fallback: No prompt captured
-    // In some browsers, we can try to trigger it via hidden link or just let the user know
+    // Show a manual instruction toast or modal
+    if (!isStandalone) {
+      if (isIOSDevice) {
+        setShowIOSInstructions(true);
+      } else {
+        alert('To install this app: \n1. Click your browser menu (⋮ or ⋯)\n2. Select "Install App" or "Add to Home Screen"');
+      }
+    }
     console.log('PWA Prompt not available yet.');
   };
 
